@@ -1,3 +1,4 @@
 .env
 .env.*
 !.env.example
+SDC-App/app/google-services.json

@@ -4,4 +4,12 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="bg_content">#F6F8FB</color>
+    <color name="text_header">#14006B</color>
+
+    <color name="connection_online">#4BC85E</color>"
+    <color name="connection_offline">#80000000</color>
+
+    <color name="progress_track">#F3F3F3</color>"
+    <color name="bg_progress">@color/text_header</color>""
+
 </resources>

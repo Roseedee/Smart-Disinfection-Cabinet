@@ -3,11 +3,683 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textDashboard"
-        android:gravity="center"
+    <ScrollView
+        android:id="@+id/dashboardScroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Dashboard"/>
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingTop="15dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="24dp">
+
+            <LinearLayout
+                android:id="@+id/deviceHeader"
+                android:layout_width="match_parent"
+                android:layout_height="38dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/deviceNameText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="22dp"
+                        android:gravity="center_vertical"
+                        android:fontFamily="@font/kanit_semibold"
+                        android:text="เครื่องอบฆ่าเชื้อ"
+                        android:textColor="@color/text_header"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/deviceSerialText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="16dp"
+                        android:gravity="center_vertical"
+                        android:fontFamily="@font/kanit"
+                        android:text="NHO124145OLASDF"
+                        android:textColor="#99000000"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="66dp"
+                    android:layout_height="match_parent"
+                    android:gravity="end"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="52dp"
+                        android:layout_height="22dp"
+                        android:gravity="center_vertical|end"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:id="@+id/onlineDot"
+                            android:layout_width="5dp"
+                            android:layout_height="5dp"
+                            android:background="@drawable/bg_online_dot" />
+
+                        <TextView
+                            android:id="@+id/onlineStatusText"
+                            android:layout_width="42dp"
+                            android:layout_height="22dp"
+                            android:layout_marginStart="5dp"
+                            android:gravity="center_vertical"
+                            android:fontFamily="@font/kanit_semibold"
+                            android:text="ออนไลน์"
+                            android:textColor="@color/connection_online"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/usageStatusText"
+                        android:layout_width="66dp"
+                        android:layout_height="16dp"
+                        android:gravity="end|center_vertical"
+                        android:fontFamily="@font/kanit"
+                        android:text="ยังไม่มีการใช้งาน"
+                        android:textSize="10sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/addOperationButton"
+                android:layout_width="match_parent"
+                android:layout_height="34dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_button_add_task"
+                android:fontFamily="@font/kanit"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
+                android:text="เพิ่มการทำงาน"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:paddingBottom="10dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_dashboard_panel"
+                android:clipChildren="true"
+                android:clipToPadding="true"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:background="@drawable/bg_dashboard_header"
+                    android:paddingVertical="10dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:fontFamily="@font/kanit_semibold"
+                    android:text="สถานะประตู"
+                    android:textColor="@color/text_header"
+                    android:textSize="14sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/doorButtonLabel"
+                            android:layout_width="match_parent"
+                            android:layout_height="22dp"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit"
+                            android:text="ปุ่มเปิดประตู"
+                            android:textColor="@android:color/black"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:id="@+id/doorButtonValue"
+                            android:layout_width="match_parent"
+                            android:layout_height="22dp"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit_semibold"
+                            android:text="ปิด"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/topDoorLabel"
+                            android:layout_width="match_parent"
+                            android:layout_height="22dp"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit"
+                            android:text="เซ็นเซอร์ประตูบน"
+                            android:textColor="@android:color/black"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:id="@+id/topDoorValue"
+                            android:layout_width="match_parent"
+                            android:layout_height="22dp"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit_semibold"
+                            android:text="ปิดอยู่"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/bottomDoorLabel"
+                            android:layout_width="match_parent"
+                            android:layout_height="22dp"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit"
+                            android:text="เซ็นเซอร์ประตูล่าง"
+                            android:textColor="@android:color/black"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:id="@+id/bottomDoorValue"
+                            android:layout_width="match_parent"
+                            android:layout_height="22dp"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit_semibold"
+                            android:text="ปิดอยู่"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_dashboard_panel"
+                    android:orientation="vertical"
+                    android:paddingBottom="12dp">
+
+                    <TextView
+                        android:background="@drawable/bg_dashboard_header"
+                        android:textAlignment="center"
+                        android:paddingVertical="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/kanit_semibold"
+                        android:text="อุคลหภูมิ"
+                        android:textColor="@color/text_header"
+                        android:textSize="14sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="27dp"
+                        android:layout_marginTop="5dp"
+                        android:paddingHorizontal="12dp"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="22dp"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/currentTemperatureText"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
+                                android:fontFamily="@font/kanit"
+                                android:text="ปัจจุบัน 32°C"
+                                android:textColor="@android:color/black"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:id="@+id/maxTemperatureText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="center_vertical"
+                                android:fontFamily="@font/kanit"
+                                android:text="100°C"
+                                android:textColor="@android:color/black"
+                                android:textSize="10sp" />
+                        </LinearLayout>
+
+                        <ProgressBar
+                            android:id="@+id/temperatureProgress"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="5dp"
+                            android:max="100"
+                            android:progress="34"
+                            android:progressBackgroundTint="@color/progress_track"
+                            android:progressTint="@color/bg_progress" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="15dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_dashboard_panel"
+                    android:orientation="vertical"
+                    android:paddingBottom="12dp">
+
+                    <TextView
+                        android:background="@drawable/bg_dashboard_header"
+                        android:textAlignment="center"
+                        android:paddingVertical="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/kanit"
+                        android:text="ความชื้น"
+                        android:textColor="@android:color/black"
+                        android:textSize="14sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="27dp"
+                        android:layout_marginTop="5dp"
+                        android:paddingHorizontal="12dp"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="22dp"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/currentHumidityText"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:gravity="center_vertical"
+                                android:fontFamily="@font/kanit"
+                                android:text="ปัจจุบัน 62%"
+                                android:textColor="@android:color/black"
+                                android:textSize="10sp" />
+
+                            <TextView
+                                android:id="@+id/maxHumidityText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:gravity="center_vertical"
+                                android:fontFamily="@font/kanit"
+                                android:text="100%"
+                                android:textColor="@android:color/black"
+                                android:textSize="10sp" />
+                        </LinearLayout>
+
+                        <ProgressBar
+                            android:id="@+id/humidityProgress"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="5dp"
+                            android:max="100"
+                            android:progress="62"
+                            android:progressBackgroundTint="@color/progress_track"
+                            android:progressTint="@color/bg_progress" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_dashboard_panel"
+                android:orientation="vertical">
+
+                <TextView
+                    android:background="@drawable/bg_dashboard_header"
+                    android:textAlignment="center"
+                    android:paddingVertical="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/kanit_semibold"
+                    android:text="การอ่านค่าของ UV"
+                    android:textColor="@color/text_header"
+                    android:textSize="14sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="38dp"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/averageUvText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="16dp"
+                        android:gravity="center"
+                        android:fontFamily="@font/kanit"
+                        android:text="ค่า UV โดยเฉลี่ย"
+                        android:textColor="@android:color/black"
+                        android:textSize="10sp" />
+
+                    <TextView
+                        android:id="@+id/uvSensorAvgValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="22dp"
+                        android:gravity="center"
+                        android:fontFamily="@font/kanit_semibold"
+                        android:text="0mW/cm²"
+                        android:textColor="@android:color/black"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/uvSensor1Label"
+                            android:background="@drawable/bg_text_sensor"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit"
+                            android:text="Sensor 1"
+                            android:textColor="@android:color/black"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:id="@+id/uvSensor1Value"
+                            android:layout_width="match_parent"
+                            android:layout_height="22dp"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit_semibold"
+                            android:text="0mW/cm²"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/uvSensor2Label"
+                            android:background="@drawable/bg_text_sensor"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit"
+                            android:text="Sensor 2"
+                            android:textColor="@android:color/black"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:id="@+id/uvSensor2Value"
+                            android:layout_width="match_parent"
+                            android:layout_height="22dp"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit_semibold"
+                            android:text="0mW/cm²"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/uvSensor3Label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_text_sensor"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit"
+                            android:text="Sensor 3"
+                            android:textColor="@android:color/black"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:id="@+id/uvSensor3Value"
+                            android:layout_width="match_parent"
+                            android:layout_height="22dp"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit_semibold"
+                            android:text="0mW/cm²"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/uvSensor4Label"
+                            android:background="@drawable/bg_text_sensor"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit"
+                            android:text="Sensor 4"
+                            android:textColor="@android:color/black"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:id="@+id/uvSensor4Value"
+                            android:layout_width="match_parent"
+                            android:layout_height="22dp"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit_semibold"
+                            android:text="0mW/cm²"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_dashboard_panel"
+                android:orientation="vertical">
+
+                <TextView
+                    android:background="@drawable/bg_dashboard_header"
+                    android:textAlignment="center"
+                    android:paddingVertical="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/kanit_semibold"
+                    android:text="สถานะของไฟ UV"
+                    android:textColor="@color/text_header"
+                    android:textSize="14sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/uvLightLeftLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_text_sensor"
+                            android:fontFamily="@font/kanit"
+                            android:gravity="center"
+                            android:text="หลอดซ้าย"
+                            android:textColor="@android:color/black"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:id="@+id/uvLightLeftValue"
+                            android:layout_width="match_parent"
+                            android:layout_height="22dp"
+                            android:layout_marginTop="3dp"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit_semibold"
+                            android:text="ปิดอยู่"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/uvLightTopLeftLabel"
+                            android:background="@drawable/bg_text_sensor"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit"
+                            android:text="หลอดบนซ้าย"
+                            android:textColor="@android:color/black"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:id="@+id/uvLightTopLeftValue"
+                            android:layout_width="match_parent"
+                            android:layout_height="22dp"
+                            android:layout_marginTop="3dp"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit_semibold"
+                            android:text="เปิดอยู่"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/uvLightTopRightLabel"
+                            android:background="@drawable/bg_text_sensor"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit"
+                            android:text="หลอดบนขวา"
+                            android:textColor="@android:color/black"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:id="@+id/uvLightTopRightValue"
+                            android:layout_width="match_parent"
+                            android:layout_height="22dp"
+                            android:layout_marginTop="3dp"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit_semibold"
+                            android:text="เปิดอยู่"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/uvLightRightLabel"
+                            android:background="@drawable/bg_text_sensor"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit"
+                            android:text="หลอดขวา"
+                            android:textColor="@android:color/black"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:id="@+id/uvLightRightValue"
+                            android:layout_width="match_parent"
+                            android:layout_height="22dp"
+                            android:layout_marginTop="3dp"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit_semibold"
+                            android:text="ปิดอยู่"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
 </FrameLayout>

@@ -30,6 +30,7 @@
             android:gravity="center"
             android:text="หน้าหลัก"
             android:background="@drawable/bg_selector_menu"
+            android:fontFamily="@font/kanit_semibold"
             android:clickable="true"
             android:focusable="true" />
         <TextView
@@ -40,6 +41,7 @@
             android:gravity="center"
             android:text="บันทึกการใช้งาน"
             android:background="@drawable/bg_selector_menu"
+            android:fontFamily="@font/kanit_semibold"
             android:clickable="true"
             android:focusable="true" />
         <TextView
@@ -50,6 +52,7 @@
             android:gravity="center"
             android:text="การตั้งค่า"
             android:background="@drawable/bg_selector_menu"
+            android:fontFamily="@font/kanit_semibold"
             android:clickable="true"
             android:focusable="true" />
         </LinearLayout>
