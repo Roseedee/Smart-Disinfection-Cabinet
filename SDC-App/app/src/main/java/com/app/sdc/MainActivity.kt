@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.app.sdc.view.AddTaskView
 import com.app.sdc.view.DashboardView
 import com.app.sdc.view.HistoryView
 import com.app.sdc.view.SettingsView
@@ -43,13 +44,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showDashboard() {
+        val dashboardView = DashboardView(this)
+
+        dashboardView.onAddTaskClick = {
+
+            contentContainer.removeAllViews()
+
+            contentContainer.addView(
+                AddTaskView(this)
+            )
+        }
         contentContainer.removeAllViews()
         contentContainer.addView(
-            DashboardView(this)
+            dashboardView
         )
-        findViewById<TextView>(R.id.menuDashboard).isSelected = true;
-        findViewById<TextView>(R.id.menuHistory).isSelected = false;
-        findViewById<TextView>(R.id.menuSettings).isSelected = false;
+        findViewById<TextView>(R.id.menuDashboard).isSelected = true
+        findViewById<TextView>(R.id.menuHistory).isSelected = false
+        findViewById<TextView>(R.id.menuSettings).isSelected = false
     }
 
     private fun showHistory() {
@@ -57,9 +68,9 @@ class MainActivity : AppCompatActivity() {
         contentContainer.addView(
             HistoryView(this)
         )
-        findViewById<TextView>(R.id.menuDashboard).isSelected = false;
-        findViewById<TextView>(R.id.menuHistory).isSelected = true;
-        findViewById<TextView>(R.id.menuSettings).isSelected = false;
+        findViewById<TextView>(R.id.menuDashboard).isSelected = false
+        findViewById<TextView>(R.id.menuHistory).isSelected = true
+        findViewById<TextView>(R.id.menuSettings).isSelected = false
     }
 
     private fun showSettings() {
@@ -67,9 +78,9 @@ class MainActivity : AppCompatActivity() {
         contentContainer.addView(
             SettingsView(this)
         )
-        findViewById<TextView>(R.id.menuDashboard).isSelected = false;
-        findViewById<TextView>(R.id.menuHistory).isSelected = false;
-        findViewById<TextView>(R.id.menuSettings).isSelected = true;
+        findViewById<TextView>(R.id.menuDashboard).isSelected = false
+        findViewById<TextView>(R.id.menuHistory).isSelected = false
+        findViewById<TextView>(R.id.menuSettings).isSelected = true
     }
 
     private fun applySystemBarsPadding() {

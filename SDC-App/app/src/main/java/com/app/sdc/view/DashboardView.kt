@@ -2,6 +2,7 @@ package com.app.sdc.view
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.TextView
@@ -22,6 +23,8 @@ class DashboardView @JvmOverloads constructor(
     private var dashboardRef: DatabaseReference? = null
     private var dashboardListener: ValueEventListener? = null
 
+    var onAddTaskClick: (() -> Unit)? = null
+
     init {
         LayoutInflater.from(context).inflate(
             R.layout.view_dashboard,
@@ -29,7 +32,12 @@ class DashboardView @JvmOverloads constructor(
             true
         )
 
+
         observeDashboard()
+
+        findViewById<TextView>(R.id.addOperationButton).setOnClickListener {
+            onAddTaskClick?.invoke()
+        }
     }
 
     private fun observeDashboard() {

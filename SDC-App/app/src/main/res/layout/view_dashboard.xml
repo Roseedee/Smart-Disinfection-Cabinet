@@ -34,7 +34,7 @@
                     <TextView
                         android:id="@+id/deviceNameText"
                         android:layout_width="wrap_content"
-                        android:layout_height="22dp"
+                        android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:fontFamily="@font/kanit_semibold"
                         android:text="เครื่องอบฆ่าเชื้อ"
@@ -44,7 +44,7 @@
                     <TextView
                         android:id="@+id/deviceSerialText"
                         android:layout_width="wrap_content"
-                        android:layout_height="16dp"
+                        android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:fontFamily="@font/kanit"
                         android:text="NHO124145OLASDF"
@@ -72,8 +72,8 @@
 
                         <TextView
                             android:id="@+id/onlineStatusText"
-                            android:layout_width="42dp"
-                            android:layout_height="22dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:layout_marginStart="5dp"
                             android:gravity="center_vertical"
                             android:fontFamily="@font/kanit_semibold"
@@ -84,8 +84,8 @@
 
                     <TextView
                         android:id="@+id/usageStatusText"
-                        android:layout_width="66dp"
-                        android:layout_height="16dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:gravity="end|center_vertical"
                         android:fontFamily="@font/kanit"
                         android:text="ยังไม่มีการใช้งาน"
