@@ -1,13 +1,430 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
-        android:id="@+id/textAddTask"
-        android:gravity="center"
+    <ScrollView
+        android:id="@+id/dashboardScroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="View Add Task"/>
+        android:fillViewport="true">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingTop="15dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="24dp">
+
+            <LinearLayout
+                android:id="@+id/deviceHeader"
+                android:layout_width="match_parent"
+                android:layout_height="38dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/deviceNameText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:fontFamily="@font/kanit_semibold"
+                        android:text="เครื่องอบฆ่าเชื้อ"
+                        android:textColor="@color/text_header"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/deviceSerialText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:fontFamily="@font/kanit"
+                        android:text="NHO124145OLASDF"
+                        android:textColor="#99000000"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="66dp"
+                    android:layout_height="match_parent"
+                    android:gravity="end"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="52dp"
+                        android:layout_height="22dp"
+                        android:gravity="center_vertical|end"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:id="@+id/onlineDot"
+                            android:layout_width="5dp"
+                            android:layout_height="5dp"
+                            android:background="@drawable/bg_online_dot" />
+
+                        <TextView
+                            android:id="@+id/onlineStatusText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:gravity="center_vertical"
+                            android:fontFamily="@font/kanit_semibold"
+                            android:text="ออนไลน์"
+                            android:textColor="@color/connection_online"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/usageStatusText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="end|center_vertical"
+                        android:fontFamily="@font/kanit"
+                        android:text="ยังไม่มีการใช้งาน"
+                        android:textSize="10sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_dashboard_panel"
+                android:clipChildren="true"
+                android:clipToPadding="true"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:background="@drawable/bg_dashboard_header"
+                    android:paddingVertical="10dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:fontFamily="@font/kanit_semibold"
+                    android:text="กำหนดเวลาทำงาน"
+                    android:textColor="@color/text_header"
+                    android:textSize="14sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="15dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <!-- - -->
+                    <TextView
+                        android:id="@+id/minusButton"
+                        android:layout_width="32dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="10dp"
+                        android:background="@drawable/bg_time_button"
+                        android:gravity="center"
+                        android:text="-"
+                        android:textColor="@android:color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <!-- Time RadioGroup -->
+                    <RadioGroup
+                        android:id="@+id/timeRadioGroup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <!-- Hour -->
+                        <RadioButton
+                            android:id="@+id/hourRadio"
+                            android:layout_width="36dp"
+                            android:layout_height="30dp"
+                            android:background="@drawable/time_radio_selector"
+                            android:button="@null"
+                            android:gravity="center"
+                            android:padding="0dp"
+                            android:text="00"
+                            android:textColor="@color/time_text_selector"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="16dp"
+                            android:layout_height="30dp"
+                            android:gravity="center"
+                            android:text=":"
+                            android:textColor="#333333"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <!-- Minute -->
+                        <RadioButton
+                            android:id="@+id/minuteRadio"
+                            android:layout_width="36dp"
+                            android:layout_height="30dp"
+                            android:background="@drawable/time_radio_selector"
+                            android:button="@null"
+                            android:gravity="center"
+                            android:padding="0dp"
+                            android:text="00"
+                            android:textColor="@color/time_text_selector"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="16dp"
+                            android:layout_height="30dp"
+                            android:gravity="center"
+                            android:text=":"
+                            android:textColor="#333333"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+
+                        <!-- Second -->
+                        <RadioButton
+                            android:id="@+id/secondRadio"
+                            android:layout_width="36dp"
+                            android:layout_height="30dp"
+                            android:background="@drawable/time_radio_selector"
+                            android:checked="true"
+                            android:button="@null"
+                            android:gravity="center"
+                            android:padding="0dp"
+                            android:text="00"
+                            android:textColor="@color/time_text_selector"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                    </RadioGroup>
+
+                    <!-- + -->
+                    <TextView
+                        android:id="@+id/plusButton"
+                        android:layout_width="32dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/bg_time_button"
+                        android:gravity="center"
+                        android:text="+"
+                        android:textColor="@android:color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="20dp"-->
+<!--                android:background="@drawable/bg_dashboard_panel"-->
+<!--                android:clipChildren="true"-->
+<!--                android:clipToPadding="true"-->
+<!--                android:orientation="vertical">-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:background="@drawable/bg_dashboard_header"-->
+<!--                    android:paddingVertical="10dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:gravity="center"-->
+<!--                    android:fontFamily="@font/kanit_semibold"-->
+<!--                    android:text="กำหนดเวลาทำงาน"-->
+<!--                    android:textColor="@color/text_header"-->
+<!--                    android:textSize="14sp" />-->
+
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:paddingVertical="15dp"-->
+<!--                    android:gravity="center"-->
+<!--                    android:orientation="vertical">-->
+
+<!--                    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--                        xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:padding="16dp">-->
+
+<!--                        <com.google.android.material.switchmaterial.SwitchMaterial-->
+<!--                            android:id="@+id/material_switch"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            app:layout_constraintEnd_toEndOf="parent"-->
+<!--                            app:layout_constraintStart_toStartOf="parent"-->
+<!--                            app:layout_constraintTop_toTopOf="parent" />-->
+
+<!--                    </androidx.constraintlayout.widget.ConstraintLayout>-->
+<!--                </LinearLayout>-->
+<!--                -->
+<!--                -->
+<!--            </LinearLayout>-->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/bg_dashboard_panel"
+                android:orientation="vertical">
+
+                <TextView
+                    android:background="@drawable/bg_dashboard_header"
+                    android:textAlignment="center"
+                    android:paddingVertical="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/kanit_semibold"
+                    android:text="กำหนดการเปิดปิดของไฟ UV"
+                    android:textColor="@color/text_header"
+                    android:textSize="14sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_text_sensor"
+                            android:fontFamily="@font/kanit"
+                            android:gravity="center"
+                            android:text="หลอดซ้าย"
+                            android:textColor="@android:color/black"
+                            android:textSize="10sp" />
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/lamp1Button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:background="@drawable/bg_text_sensor"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit"
+                            android:text="หลอดบนซ้าย"
+                            android:textColor="@android:color/black"
+                            android:textSize="10sp" />
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/lamp2Button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:background="@drawable/bg_text_sensor"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit"
+                            android:text="หลอดบนขวา"
+                            android:textColor="@android:color/black"
+                            android:textSize="10sp" />
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/lamp3Button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:background="@drawable/bg_text_sensor"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit"
+                            android:text="หลอดขวา"
+                            android:textColor="@android:color/black"
+                            android:textSize="10sp" />
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/lamp4Button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/notifyCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="แจ้งเตือนเมื่อทำงานเสร็จ"
+                android:textSize="14sp"
+                android:textColor="@android:color/black"
+                android:buttonTint="#777777"
+                android:padding="0dp"
+                android:layout_marginTop="10dp" />
+
+            <Button
+                android:id="@+id/addTaskButton"
+                android:layout_width="match_parent"
+                android:layout_height="34dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/bg_button_add_task"
+                android:fontFamily="@font/kanit"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
+                android:text="เพิ่มการทำงาน"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </ScrollView>
 </FrameLayout>

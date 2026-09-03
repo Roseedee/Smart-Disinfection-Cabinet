@@ -35,7 +35,7 @@ class DashboardView @JvmOverloads constructor(
 
         observeDashboard()
 
-        findViewById<TextView>(R.id.addOperationButton).setOnClickListener {
+        findViewById<TextView>(R.id.openAddTaskView).setOnClickListener {
             onAddTaskClick?.invoke()
         }
     }
