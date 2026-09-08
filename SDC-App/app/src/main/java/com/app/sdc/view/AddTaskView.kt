@@ -40,22 +40,14 @@ class AddTaskView @JvmOverloads constructor(
     private val deviceId = "esp_001"
 
     init {
-        LayoutInflater.from(context).inflate(
-            R.layout.view_add_task,
-            this,
-            true
-        )
+        LayoutInflater.from(context).inflate(R.layout.view_add_task, this, true)
 
         hourRadio = findViewById(R.id.hourRadio)
         minuteRadio = findViewById(R.id.minuteRadio)
         secondRadio = findViewById(R.id.secondRadio)
 
-        // เริ่มต้นเลือกวินาที
         secondRadio.isChecked = true
 
-        // ==============================
-        // + / -
-        // ==============================
         val plusButton = findViewById<TextView>(R.id.plusButton)
         val minusButton = findViewById<TextView>(R.id.minusButton)
 
@@ -69,23 +61,13 @@ class AddTaskView @JvmOverloads constructor(
 
         updateTime()
 
-        // ==========================================
-        // Lamp ToggleButton
-        // ==========================================
-
         lamp1Button = findViewById(R.id.lamp1Button)
-
         lamp2Button = findViewById(R.id.lamp2Button)
-
         lamp3Button = findViewById(R.id.lamp3Button)
-
         lamp4Button = findViewById(R.id.lamp4Button)
 
-        val addTaskButton =
-            findViewById<Button>(R.id.addTaskButton)
-
+        val addTaskButton = findViewById<Button>(R.id.addTaskButton)
         addTaskButton.setOnClickListener {
-
             uploadTaskToFirebase()
         }
     }
@@ -138,10 +120,6 @@ class AddTaskView @JvmOverloads constructor(
         secondRadio.text = String.format("%02d", seconds)
     }
 
-    // =====================================================
-    // Duration
-    // =====================================================
-
     private fun getDuration(): Int {
         return (hours * 3600) + (minutes * 60) + seconds
     }
@@ -163,44 +141,31 @@ class AddTaskView @JvmOverloads constructor(
         val taskId = generateTaskId()
 
         val lamps = JSONObject()
-
         lamps.put("L1", lamp1Button.isChecked)
-
         lamps.put("L2", lamp2Button.isChecked)
-
         lamps.put("L3", lamp3Button.isChecked)
-
         lamps.put("L4", lamp4Button.isChecked)
 
         val task = JSONObject()
-
         task.put("duration", duration)
-
         task.put("status", "pending")
-
         task.put("lamps",lamps)
 
         val urlString = "$databaseUrl/devices/$deviceId/tasks/$taskId.json"
-
 
         Thread {
             var connection: HttpURLConnection? = null
             try {
                 val url = URL(urlString)
                 connection = url.openConnection() as HttpURLConnection
-
                 connection.requestMethod = "PUT"
-
                 connection.setRequestProperty(
                     "Content-Type",
                     "application/json"
                 )
-
                 connection.doOutput = true
-
                 connection.connectTimeout = 10000
                 connection.readTimeout = 10000
-
                 connection.outputStream.use { output -> output.write(task.toString().toByteArray(Charsets.UTF_8))}
 
                 val responseCode = connection.responseCode
