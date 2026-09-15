@@ -2,15 +2,10 @@
 #define TASK_MANAGER_H
 
 #include <Arduino.h>
-
 #include "Task.h"
-#include "DisinfectionController.h"
-#include "StatusLED.h"
 
-
-// =====================================================
-// TASK MANAGER
-// =====================================================
+class DisinfectionController;
+class StatusLED;
 
 class TaskManager
 {
@@ -21,63 +16,37 @@ public:
         StatusLED& statusLED
     );
 
-
-    // -------------------------------------------------
-    // Begin
-    // -------------------------------------------------
-
     void begin();
 
-
-    // -------------------------------------------------
-    // Update
-    // -------------------------------------------------
-
-    void update(unsigned long now);
-
-
-    // -------------------------------------------------
-    // Submit Task
-    // -------------------------------------------------
-
+    // รับ Task ใหม่
     bool submit(const Task& task);
 
+    // ประมวลผล Task
+    void update(unsigned long now);
 
-    // -------------------------------------------------
-    // State
-    // -------------------------------------------------
+    // จบ Task
+    void finishTask();
+
+    // หยุด Task
+    void stopTask();
+
+    // ยกเลิก/ล้าง Task
+    void clearTask();
 
     bool hasTask() const;
 
     TaskStatus getStatus() const;
 
+    const Task& getTask() const;
 
 private:
 
-    // -------------------------------------------------
-    // Hardware
-    // -------------------------------------------------
-
     DisinfectionController& _disinfection;
-
     StatusLED& _statusLED;
-
-
-    // -------------------------------------------------
-    // Current Task
-    // -------------------------------------------------
 
     Task _task;
 
     bool _hasTask;
-
-
-    // -------------------------------------------------
-    // Finish protection
-    // -------------------------------------------------
-
-    bool _finishHandled;
 };
-
 
 #endif

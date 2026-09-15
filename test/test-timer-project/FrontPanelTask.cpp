@@ -1,29 +1,22 @@
 #include "FrontPanelTask.h"
 
+#include "Buttons.h"
+#include "Timer.h"
+#include "Buzzer.h"
+#include "TaskManager.h"
 
-// =====================================================
-// CONSTRUCTOR
-// =====================================================
 
 FrontPanelTask::FrontPanelTask(
   Buttons& buttons,
   Timer& timer,
-  Buzzer& buzzer)
+  Buzzer& buzzer,
+  TaskManager& taskManager)
   : _buttons(buttons),
     _timer(timer),
     _buzzer(buzzer),
+    _taskManager(taskManager),
+    _hasTask(false),
     _previousRunning(false) {
-}
-
-
-// =====================================================
-// BEGIN
-// =====================================================
-
-void FrontPanelTask::begin() {
-  _task.clear();
-
-  _previousRunning = _timer.isRunning();
 }
 
 
@@ -32,122 +25,115 @@ void FrontPanelTask::begin() {
 // =====================================================
 
 void FrontPanelTask::update(unsigned long now) {
-  // =================================================
-  // BUTTONS
-  // =================================================
+  // -------------------------------------------------
+  // Buttons
+  // -------------------------------------------------
 
   _buttons.update(now);
 
 
-  // =================================================
-  // BUTTON BEEP
-  // =================================================
+  // -------------------------------------------------
+  // Button beep
+  // -------------------------------------------------
 
   if (_buttons.startPressed() || _buttons.upPressed() || _buttons.downPressed() || _buttons.setPressed()) {
     _buzzer.buttonBeep(now);
   }
 
 
-  // =================================================
-  // TIMER
-  //
-  // ใช้ Timer เดิม
-  // =================================================
+  // -------------------------------------------------
+  // Timer
+  // -------------------------------------------------
 
-  _timer.update(
-    now,
-    _buttons);
+  _timer.update(now, _buttons);
 
 
   bool running = _timer.isRunning();
 
 
   // =================================================
-  // TIMER START
+  // START
   // =================================================
 
   if (_timer.consumeStartedEvent()) {
-    uint32_t duration = _timer.remainingSeconds();
+    // ถ้ามี Task เก่าค้างอยู่
+    if (_hasTask) {
+      Serial.println("[FRONT PANEL] Old task exists");
+      return;
+    }
 
 
-    // ---------------------------------------------
-    // สร้าง Task จาก Front Panel
-    //
-    // Front Panel:
-    // Lamp ทั้ง 4 ดวง ON
-    // ---------------------------------------------
-
+    // Front panel ใช้หลอดทั้ง 4
     _task.create(
       TaskSource::FRONT_PANEL,
-      duration);
+      _timer.remainingSeconds(),
 
-
-    // ---------------------------------------------
-    // เสียงเริ่มทำงาน
-    // ---------------------------------------------
-
-    _buzzer.startBeep(now);
+      true,
+      true,
+      true,
+      true);
 
 
     Serial.println("[FRONT PANEL] Task created");
 
-    Serial.print("[TASK] Duration: ");
-    Serial.print(duration);
-    Serial.println(" seconds");
 
-    Serial.println("[TASK] Source: FRONT_PANEL");
+    // ส่ง Task เข้า TaskManager
+    if (_taskManager.submit(_task)) {
+      _hasTask = true;
 
-    Serial.println("[TASK] Lamps: ALL ON");
+      Serial.println("[FRONT PANEL] Task submitted");
+    } else {
+      Serial.println("[FRONT PANEL] Submit failed");
+    }
+
+
+    // Buzzer start
+    _buzzer.startBeep(now);
   }
 
 
   // =================================================
   // TIME UP
-  //
-  // ต้องตรวจ TIME UP ก่อน STOP
-  // เพราะ Timer เมื่อถึง 0 จะ running = false
   // =================================================
 
   bool timeUp = _timer.consumeTimeUpEvent();
 
 
   if (timeUp) {
-    if (_task.isValid()) {
-      _task.setStatus(
-        TaskStatus::FINISHED);
-    }
+    Serial.println("[FRONT PANEL] TIME UP");
 
+
+    // Buzzer alarm
     _buzzer.timeUp(now);
 
-    Serial.println("[FRONT PANEL] Task finished");
-  } else if (_previousRunning && !running && _task.isValid() && _task.getStatus() == TaskStatus::RUNNING) {
-    _task.setStatus(
-      TaskStatus::STOPPED);
 
-    Serial.println("[FRONT PANEL] Task stopped");
+    // ให้ TaskManager จัดการจบงาน
+    _taskManager.finishTask();
+
+    _hasTask = false;
+    _previousRunning = false;
+
+    return;
   }
 
 
   // =================================================
   // MANUAL STOP
-  //
-  // RUNNING -> STOPPED
-  //
-  // จะทำงานเฉพาะกรณีที่ไม่ได้ TIME UP
   // =================================================
 
-  else if (_previousRunning && !running && _task.isValid() && _task.getStatus() == TaskStatus::RUNNING) {
-    _task.setStatus(
-      TaskStatus::STOPPED);
+  if (_previousRunning && !running) {
+    // ถ้าไม่ได้เป็น TIME UP
+    // แปลว่า user กด START/STOP เพื่อหยุด
 
+    if (_taskManager.getStatus() == TaskStatus::RUNNING) {
+      Serial.println("[FRONT PANEL] Manual STOP");
 
-    Serial.println("[FRONT PANEL] Task stopped");
+      _taskManager.stopTask();
+
+      _hasTask = false;
+    }
   }
 
-
-  // =================================================
-  // SAVE RUNNING STATE
-  // =================================================
 
   _previousRunning = running;
 }
@@ -158,7 +144,7 @@ void FrontPanelTask::update(unsigned long now) {
 // =====================================================
 
 bool FrontPanelTask::hasTask() const {
-  return _task.isValid();
+  return _hasTask;
 }
 
 
@@ -166,15 +152,19 @@ bool FrontPanelTask::hasTask() const {
 // GET TASK
 // =====================================================
 
-Task& FrontPanelTask::getTask() {
+const Task& FrontPanelTask::getTask() const {
   return _task;
 }
 
 
 // =====================================================
-// CLEAR TASK
+// CLEAR
 // =====================================================
 
 void FrontPanelTask::clearTask() {
   _task.clear();
+
+  _hasTask = false;
+
+  _previousRunning = false;
 }

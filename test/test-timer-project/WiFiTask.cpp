@@ -117,6 +117,37 @@ void WiFiTask::update(unsigned long now)
     }
 }
 
+void WiFiTask::reconnect()
+{
+    Serial.println();
+    Serial.println("======================");
+    Serial.println("   WIFI RECONNECT");
+    Serial.println("======================");
+
+    // Reset state
+    _connected = false;
+    _offline = false;
+
+    // ตัด connection เดิม
+    WiFi.disconnect(true);
+
+    delay(100);
+
+    // กลับมาเป็น Station
+    WiFi.mode(WIFI_STA);
+
+    // เริ่มเชื่อมต่อใหม่
+    WiFi.begin(
+        _ssid,
+        _password
+    );
+
+    _startTime = millis();
+
+    Serial.print("[WiFi] Reconnecting to: ");
+    Serial.println(_ssid);
+}
+
 
 // =====================================================
 // STATE

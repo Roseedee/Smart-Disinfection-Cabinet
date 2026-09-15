@@ -1,19 +1,14 @@
 #include "TaskManager.h"
+#include "DisinfectionController.h"
+#include "StatusLED.h"
 
-
-// =====================================================
-// CONSTRUCTOR
-// =====================================================
 
 TaskManager::TaskManager(
-    DisinfectionController& disinfection,
-    StatusLED& statusLED
-)
-    : _disinfection(disinfection),
-      _statusLED(statusLED),
-      _hasTask(false),
-      _finishHandled(false)
-{
+  DisinfectionController& disinfection,
+  StatusLED& statusLED)
+  : _disinfection(disinfection),
+    _statusLED(statusLED),
+    _hasTask(false) {
 }
 
 
@@ -21,16 +16,15 @@ TaskManager::TaskManager(
 // BEGIN
 // =====================================================
 
-void TaskManager::begin()
-{
-    // Clear Task
-    _task.clear();
+void TaskManager::begin() {
+  _task.clear();
 
-    // ไม่มี Task
-    _hasTask = false;
+  _hasTask = false;
 
-    // ยังไม่มีการ Finish
-    _finishHandled = false;
+  _disinfection.stop();
+  _statusLED.stopWorking();
+
+  Serial.println("[TASK MANAGER] Ready");
 }
 
 
@@ -38,48 +32,27 @@ void TaskManager::begin()
 // SUBMIT TASK
 // =====================================================
 
-bool TaskManager::submit(const Task& task)
-{
-    // -------------------------------------------------
-    // Task ไม่ valid
-    // -------------------------------------------------
-
-    if (!task.isValid())
-    {
-        return false;
+bool TaskManager::submit(const Task& task) {
+  // ไม่รับงานใหม่ถ้ากำลังทำงานอยู่
+  if (_hasTask) {
+    if (_task.getStatus() == TaskStatus::RUNNING || _task.getStatus() == TaskStatus::PAUSED) {
+      Serial.println("[TASK MANAGER] Busy");
+      return false;
     }
+  }
 
 
-    // -------------------------------------------------
-    // ไม่รับ Task ใหม่
-    // ถ้ายังมีงานกำลังทำงาน
-    // -------------------------------------------------
+  // copy task เข้ามาเป็น task หลัก
+  _task = task;
 
-    if (_hasTask)
-    {
-        if (_task.getStatus() == TaskStatus::RUNNING ||
-            _task.getStatus() == TaskStatus::PAUSED)
-        {
-            return false;
-        }
-    }
+  _task.setStatus(TaskStatus::PENDING);
+
+  _hasTask = true;
 
 
-    // -------------------------------------------------
-    // รับ Task
-    // -------------------------------------------------
+  Serial.println("[TASK MANAGER] Task submitted");
 
-    _task = task;
-
-    _hasTask = true;
-
-    _finishHandled = false;
-
-
-    Serial.println("[TASK MANAGER] Task submitted");
-
-
-    return true;
+  return true;
 }
 
 
@@ -87,183 +60,147 @@ bool TaskManager::submit(const Task& task)
 // UPDATE
 // =====================================================
 
-void TaskManager::update(unsigned long now)
-{
-    // -------------------------------------------------
-    // ไม่มี Task
-    // -------------------------------------------------
+void TaskManager::update(unsigned long now) {
+  if (!_hasTask)
+    return;
 
-    if (!_hasTask)
-    {
-        return;
-    }
+  // -------------------------------------------------
+  // PENDING
+  // -------------------------------------------------
 
+  if (_task.getStatus() == TaskStatus::PENDING) {
 
-    // =================================================
-    // PENDING
-    // =================================================
+    Serial.println("[TASK MANAGER] START TASK");
 
-    if (_task.getStatus() == TaskStatus::PENDING)
-    {
-        Serial.println("[TASK MANAGER] Starting task");
+    _disinfection.start(
+      _task.getLamp(1),
+      _task.getLamp(2),
+      _task.getLamp(3),
+      _task.getLamp(4)
+    );
 
+    _task.setStatus(TaskStatus::RUNNING);
 
-        // ---------------------------------------------
-        // เปิด Lamp ตาม Task
-        // ---------------------------------------------
+    _statusLED.startWorking(now);
 
-        _disinfection.start(
-            _task.getLamp(1),
-            _task.getLamp(2),
-            _task.getLamp(3),
-            _task.getLamp(4)
-        );
+    Serial.println("[TASK MANAGER] RUNNING");
+  }
 
+  // -------------------------------------------------
+  // RUNNING
+  // -------------------------------------------------
 
-        // ---------------------------------------------
-        // Task -> RUNNING
-        // ---------------------------------------------
+  else if (_task.getStatus() == TaskStatus::RUNNING) {
+    // Timer ถูกควบคุมโดย FrontPanelTask
+  }
 
-        _task.setStatus(
-            TaskStatus::RUNNING
-        );
+  // -------------------------------------------------
+  // PAUSED
+  // -------------------------------------------------
 
+  else if (_task.getStatus() == TaskStatus::PAUSED) {
+    // รองรับภายหลัง
+  }
 
-        // ---------------------------------------------
-        // Working LED
-        // ---------------------------------------------
+  // -------------------------------------------------
+  // FINISHED
+  // -------------------------------------------------
 
-        _statusLED.startWorking(now);
+  else if (_task.getStatus() == TaskStatus::FINISHED) {
+    // จบแล้ว ไม่ต้องทำอะไร
+    // Finish Animation ถูกเริ่มจาก finishTask()
+  }
 
+  // -------------------------------------------------
+  // STOPPED
+  // -------------------------------------------------
 
-        Serial.println("[TASK MANAGER] Task started");
-    }
-
-
-    // =================================================
-    // RUNNING
-    // =================================================
-
-    else if (_task.getStatus() == TaskStatus::RUNNING)
-    {
-        // ---------------------------------------------
-        // ไม่ต้องทำอะไร
-        //
-        // Hardware กำลังทำงาน
-        // Timer ถูกจัดการโดย FrontPanelTask
-        // ---------------------------------------------
-    }
-
-
-    // =================================================
-    // PAUSED
-    // =================================================
-
-    else if (_task.getStatus() == TaskStatus::PAUSED)
-    {
-        // ---------------------------------------------
-        // ตอนนี้ยังไม่มี Pause logic
-        // ---------------------------------------------
-    }
-
-
-    // =================================================
-    // STOPPED
-    //
-    // ผู้ใช้กด START/STOP
-    // =================================================
-
-    else if (_task.getStatus() == TaskStatus::STOPPED)
-    {
-        Serial.println("[TASK MANAGER] Task stopped");
-
-
-        // ---------------------------------------------
-        // ปิด Lamp
-        // ปิด Motor
-        // ---------------------------------------------
-
-        _disinfection.stop();
-
-
-        // ---------------------------------------------
-        // ปิด Working LED
-        // ---------------------------------------------
-
-        _statusLED.stopWorking();
-
-
-        // ---------------------------------------------
-        // จบการจัดการ Stop
-        // ---------------------------------------------
-
-        _finishHandled = true;
-    }
-
-
-    // =================================================
-    // FINISHED
-    //
-    // Timer ถึง 00:00
-    // =================================================
-
-    else if (_task.getStatus() == TaskStatus::FINISHED)
-    {
-        // ---------------------------------------------
-        // ทำเพียงครั้งเดียว
-        // ---------------------------------------------
-
-        if (!_finishHandled)
-        {
-            Serial.println("[TASK MANAGER] Task finished");
-
-
-            // -----------------------------------------
-            // ปิด Lamp ทั้งหมด
-            // ปิด Motor
-            //
-            // Active HIGH:
-            //
-            // HIGH = ON
-            // LOW  = OFF
-            // -----------------------------------------
-
-            _disinfection.stop();
-
-
-            // -----------------------------------------
-            // ปิด Working LED
-            //
-            // ไม่เรียก finish()
-            //
-            // เพราะ finish() คือ Animation
-            // และจะทำให้ WORKING LED กลับมาติด
-            // -----------------------------------------
-
-            _statusLED.stopWorking();
-
-
-            // -----------------------------------------
-            // Finish handled
-            // -----------------------------------------
-
-            _finishHandled = true;
-
-
-            Serial.println("[TASK MANAGER] Hardware stopped");
-            Serial.println("[TASK MANAGER] Working LED OFF");
-        }
-    }
+  else if (_task.getStatus() == TaskStatus::STOPPED) {
+    // จบแล้ว ไม่ต้องทำอะไร
+  }
 }
 
 
 // =====================================================
-// HAS TASK
+// FINISH TASK
 // =====================================================
 
-bool TaskManager::hasTask() const
-{
-    return _hasTask;
+void TaskManager::finishTask() {
+  if (!_hasTask)
+    return;
+
+
+  Serial.println("[TASK MANAGER] FINISH");
+
+
+  // OFF ทุกอย่าง
+  _disinfection.stop();
+
+
+  // // Working LED OFF
+  // _statusLED.stopWorking();
+  _statusLED.finish(millis());
+
+
+  // ไม่ใช้ finish()
+  //
+  // เพราะ finish() เดิมมี animation
+  // และ user ไม่ต้องการให้ Working LED กลับมากระพริบ
+
+
+  _task.setStatus(TaskStatus::FINISHED);
+
+
+  Serial.println("[TASK MANAGER] Relay OFF");
+  Serial.println("[TASK MANAGER] Motor OFF");
+  Serial.println("[TASK MANAGER] Working LED OFF");
+}
+
+
+// =====================================================
+// STOP TASK
+// =====================================================
+
+void TaskManager::stopTask() {
+  if (!_hasTask)
+    return;
+
+
+  Serial.println("[TASK MANAGER] STOP");
+
+
+  // OFF ทุกอย่าง
+  _disinfection.stop();
+
+
+  // Working LED OFF
+  _statusLED.stopWorking();
+
+
+  _task.setStatus(TaskStatus::STOPPED);
+
+
+  Serial.println("[TASK MANAGER] Relay OFF");
+  Serial.println("[TASK MANAGER] Motor OFF");
+  Serial.println("[TASK MANAGER] Working LED OFF");
+}
+
+
+// =====================================================
+// CLEAR TASK
+// =====================================================
+
+void TaskManager::clearTask() {
+  _disinfection.stop();
+
+  _statusLED.stopWorking();
+
+  _task.clear();
+
+  _hasTask = false;
+
+
+  Serial.println("[TASK MANAGER] Task cleared");
 }
 
 
@@ -271,13 +208,19 @@ bool TaskManager::hasTask() const
 // STATUS
 // =====================================================
 
-TaskStatus TaskManager::getStatus() const
-{
-    if (!_hasTask)
-    {
-        return TaskStatus::EMPTY;
-    }
+bool TaskManager::hasTask() const {
+  return _hasTask;
+}
 
 
-    return _task.getStatus();
+TaskStatus TaskManager::getStatus() const {
+  if (!_hasTask)
+    return TaskStatus::EMPTY;
+
+  return _task.getStatus();
+}
+
+
+const Task& TaskManager::getTask() const {
+  return _task;
 }

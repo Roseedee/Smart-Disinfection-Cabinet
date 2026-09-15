@@ -2,49 +2,44 @@
 #define FRONT_PANEL_TASK_H
 
 #include <Arduino.h>
-
-#include "Buttons.h"
-#include "Timer.h"
-#include "Buzzer.h"
 #include "Task.h"
+#include "WiFiTask.h"
 
+class Buttons;
+class Timer;
+class Buzzer;
+class TaskManager;
 
-class FrontPanelTask
-{
+class FrontPanelTask {
 public:
 
-    FrontPanelTask(
-        Buttons& buttons,
-        Timer& timer,
-        Buzzer& buzzer
-    );
+  FrontPanelTask(
+    Buttons& buttons,
+    Timer& timer,
+    Buzzer& buzzer,
+    TaskManager& taskManager);
+
+  void update(unsigned long now);
 
 
-    void begin();
 
-    void update(unsigned long now);
+  bool hasTask() const;
 
+  const Task& getTask() const;
 
-    // -------------------------------------------------
-    // Task
-    // -------------------------------------------------
-
-    bool hasTask() const;
-
-    Task& getTask();
-
-    void clearTask();
-
+  void clearTask();
 
 private:
+  Buttons& _buttons;
+  Timer& _timer;
+  Buzzer& _buzzer;
+  TaskManager& _taskManager;
 
-    Buttons& _buttons;
-    Timer& _timer;
-    Buzzer& _buzzer;
+  Task _task;
 
-    Task _task;
+  bool _hasTask;
 
-    bool _previousRunning;
+  bool _previousRunning;
 };
 
 #endif

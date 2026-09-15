@@ -11,6 +11,7 @@ public:
 
     void begin();
     void update(unsigned long now);
+    void reconnect();
 
     bool isConnecting() const;
     bool isConnected() const;

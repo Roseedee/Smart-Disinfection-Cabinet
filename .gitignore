@@ -2,3 +2,4 @@
 .env.*
 !.env.example
 SDC-App/app/google-services.json
+**/FirebaseConfig.h

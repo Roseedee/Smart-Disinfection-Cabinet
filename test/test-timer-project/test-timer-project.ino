@@ -12,14 +12,19 @@
 #include "Task.h"
 #include "FrontPanelTask.h"
 #include "TaskManager.h"
+#include "FirebaseManager.h"
+#include "FirebaseConfig.h"
 
+
+
+#define DEVICE_SN "AWE416E1W61"
 
 // =====================================================
 // WIFI
 // =====================================================
 
-#define WIFI_SSID       "Dee"
-#define WIFI_PASSWORD   "20022002"
+#define WIFI_SSID "Dee"
+#define WIFI_PASSWORD "20022002"
 
 
 // =====================================================
@@ -39,25 +44,25 @@
 // -----------------------------------------------------
 
 #define BUTTON_START_STOP 27
-#define BUTTON_UP         26
-#define BUTTON_DOWN       25
-#define BUTTON_SET        33
+#define BUTTON_UP 26
+#define BUTTON_DOWN 25
+#define BUTTON_SET 33
 
 
 // -----------------------------------------------------
 // Status LED
 // -----------------------------------------------------
 
-#define READY_LED         22
-#define ONLINE_LED        21
-#define WORKING_LED       5
+#define READY_LED 22
+#define ONLINE_LED 21
+#define WORKING_LED 5
 
 
 // -----------------------------------------------------
 // Buzzer
 // -----------------------------------------------------
 
-#define BUZZER_PIN        18
+#define BUZZER_PIN 18
 
 
 // -----------------------------------------------------
@@ -68,12 +73,12 @@
 // LOW  = OFF
 // -----------------------------------------------------
 
-#define LAMP1_PIN         15
-#define LAMP2_PIN         4
-#define LAMP3_PIN         16
-#define LAMP4_PIN         17
+#define LAMP1_PIN 15
+#define LAMP2_PIN 4
+#define LAMP3_PIN 16
+#define LAMP4_PIN 17
 
-#define MOTOR_PIN         19
+#define MOTOR_PIN 19
 
 
 // =====================================================
@@ -85,10 +90,9 @@
 // -----------------------------------------------------
 
 StatusLED statusLED(
-    READY_LED,
-    ONLINE_LED,
-    WORKING_LED
-);
+  READY_LED,
+  ONLINE_LED,
+  WORKING_LED);
 
 
 // -----------------------------------------------------
@@ -103,11 +107,10 @@ Timer timer;
 // -----------------------------------------------------
 
 Buttons buttons(
-    BUTTON_START_STOP,
-    BUTTON_UP,
-    BUTTON_DOWN,
-    BUTTON_SET
-);
+  BUTTON_START_STOP,
+  BUTTON_UP,
+  BUTTON_DOWN,
+  BUTTON_SET);
 
 
 // -----------------------------------------------------
@@ -115,9 +118,8 @@ Buttons buttons(
 // -----------------------------------------------------
 
 TimerDisplay display(
-    TM1637_CLK,
-    TM1637_DIO
-);
+  TM1637_CLK,
+  TM1637_DIO);
 
 
 // -----------------------------------------------------
@@ -125,8 +127,7 @@ TimerDisplay display(
 // -----------------------------------------------------
 
 Buzzer buzzer(
-    BUZZER_PIN
-);
+  BUZZER_PIN);
 
 
 // -----------------------------------------------------
@@ -134,33 +135,26 @@ Buzzer buzzer(
 // -----------------------------------------------------
 
 WiFiTask wifiTask(
-    WIFI_SSID,
-    WIFI_PASSWORD
-);
+  WIFI_SSID,
+  WIFI_PASSWORD);
 
+FirebaseManager firebaseManager(
+  FIREBASE_API_KEY,
+  FIREBASE_DATABASE_URL,
+  FIREBASE_EMAIL,
+  FIREBASE_PASSWORD,
+  DEVICE_SN);
 
 // =====================================================
 // DISINFECTION CONTROLLER
 // =====================================================
 
 DisinfectionController disinfection(
-    LAMP1_PIN,
-    LAMP2_PIN,
-    LAMP3_PIN,
-    LAMP4_PIN,
-    MOTOR_PIN
-);
-
-
-// =====================================================
-// FRONT PANEL TASK
-// =====================================================
-
-FrontPanelTask frontPanel(
-    buttons,
-    timer,
-    buzzer
-);
+  LAMP1_PIN,
+  LAMP2_PIN,
+  LAMP3_PIN,
+  LAMP4_PIN,
+  MOTOR_PIN);
 
 
 // =====================================================
@@ -168,9 +162,19 @@ FrontPanelTask frontPanel(
 // =====================================================
 
 TaskManager taskManager(
-    disinfection,
-    statusLED
-);
+  disinfection,
+  statusLED);
+
+
+// =====================================================
+// FRONT PANEL TASK
+// =====================================================
+
+FrontPanelTask frontPanel(
+  buttons,
+  timer,
+  buzzer,
+  taskManager);
 
 
 // =====================================================
@@ -178,96 +182,63 @@ TaskManager taskManager(
 // =====================================================
 
 bool systemReady = false;
-
-
-// =====================================================
-// FRONT PANEL TASK SUBMIT STATE
-// =====================================================
-
-bool frontPanelTaskSubmitted = false;
-
-
-// =====================================================
-// HARDWARE FORCE STOP STATE
-// =====================================================
-//
-// ใช้สำหรับทดสอบก่อน
-//
-// เมื่อ FrontPanelTask เปลี่ยนเป็น
-// FINISHED หรือ STOPPED
-//
-// Main จะสั่ง:
-// - Relay OFF
-// - Motor OFF
-// - Working LED OFF
-//
-// =====================================================
-
-bool hardwareForceStopped = false;
-
+bool firebaseStarted = false;
 
 // =====================================================
 // SETUP
 // =====================================================
 
-void setup()
-{
-    Serial.begin(115200);
+void setup() {
+  Serial.begin(115200);
 
-    delay(100);
-
-
-    Serial.println();
-    Serial.println("==============================");
-    Serial.println(" Smart Disinfection Cabinet");
-    Serial.println("==============================");
+  delay(100);
 
 
-    // =================================================
-    // HARDWARE INIT
-    // =================================================
-
-    buttons.begin();
-
-    display.begin();
-
-    buzzer.begin();
-
-    timer.begin();
-
-    statusLED.begin();
-
-    disinfection.begin();
-
-    frontPanel.begin();
-
-    taskManager.begin();
+  Serial.println();
+  Serial.println("==============================");
+  Serial.println(" Smart Disinfection Cabinet");
+  Serial.println("==============================");
 
 
-    // =================================================
-    // SYSTEM NOT READY
-    // =================================================
+  // =================================================
+  // HARDWARE INIT
+  // =================================================
 
-    systemReady = false;
+  buttons.begin();
 
-    frontPanelTaskSubmitted = false;
+  display.begin();
 
-    hardwareForceStopped = false;
+  buzzer.begin();
 
-    statusLED.setReady(false);
+  timer.begin();
 
-    statusLED.setOnline(false);
+  statusLED.begin();
 
+  disinfection.begin();
 
-    // =================================================
-    // WIFI START
-    // =================================================
-
-    wifiTask.begin();
+  taskManager.begin();
 
 
-    Serial.println("[SYSTEM] Booting...");
-    Serial.println("[SYSTEM] Waiting for WiFi result...");
+  // =================================================
+  // SYSTEM NOT READY
+  // =================================================
+
+  systemReady = false;
+
+  statusLED.setReady(false);
+
+  statusLED.setOnline(false);
+
+
+  // =================================================
+  // WIFI START
+  // =================================================
+
+  wifiTask.begin();
+
+
+  Serial.println("[SYSTEM] Booting...");
+  Serial.println("[SYSTEM] Waiting for WiFi result...");
 }
 
 
@@ -275,306 +246,224 @@ void setup()
 // LOOP
 // =====================================================
 
-void loop()
-{
-    unsigned long now = millis();
+void loop() {
+  unsigned long now = millis();
 
 
-    // =================================================
-    // BOOT
-    // =================================================
+  // =================================================
+  // BOOT
+  // =================================================
 
-    if (!systemReady)
-    {
-        // ---------------------------------------------
-        // 7SEG BOOT SPINNER
-        // ---------------------------------------------
+  if (!systemReady) {
+    // ---------------------------------------------
+    // 7SEG BOOT SPINNER
+    // ---------------------------------------------
 
-        display.updateLoading(now);
-
-
-        // ---------------------------------------------
-        // WIFI
-        // ---------------------------------------------
-
-        wifiTask.update(now);
+    display.updateLoading(now);
 
 
-        // ---------------------------------------------
-        // ONLINE LED
-        // ---------------------------------------------
-
-        if (wifiTask.isConnecting())
-        {
-            static unsigned long lastWiFiBlink = 0;
-            static bool wifiBlinkState = false;
-
-
-            if (now - lastWiFiBlink >= 500)
-            {
-                lastWiFiBlink = now;
-
-                wifiBlinkState = !wifiBlinkState;
-
-                statusLED.setOnline(
-                    wifiBlinkState
-                );
-            }
-        }
-        else if (wifiTask.isConnected())
-        {
-            statusLED.setOnline(true);
-        }
-        else if (wifiTask.isOffline())
-        {
-            statusLED.setOnline(false);
-        }
-
-
-        // ---------------------------------------------
-        // WIFI RESULT
-        // ---------------------------------------------
-
-        if (wifiTask.isConnected() ||
-            wifiTask.isOffline())
-        {
-            systemReady = true;
-
-            statusLED.setReady(true);
-
-
-            Serial.println();
-            Serial.println("==============================");
-            Serial.println("       SYSTEM READY");
-            Serial.println("==============================");
-
-
-            if (wifiTask.isConnected())
-            {
-                Serial.println("Network : ONLINE");
-            }
-            else
-            {
-                Serial.println("Network : OFFLINE");
-            }
-
-
-            Serial.println();
-        }
-
-
-        // ---------------------------------------------
-        // UPDATE OUTPUT SYSTEMS
-        // ---------------------------------------------
-
-        buzzer.update(now);
-
-        statusLED.update(now);
-
-
-        return;
-    }
-
-
-    // =================================================
+    // ---------------------------------------------
     // WIFI
-    // =================================================
+    // ---------------------------------------------
 
     wifiTask.update(now);
 
 
-    // =================================================
+    // ---------------------------------------------
+    // START FIREBASE
+    // ---------------------------------------------
+
+    if (wifiTask.isConnected() && !firebaseStarted) {
+      firebaseManager.begin();
+
+      firebaseStarted = true;
+
+      Serial.println("[SYSTEM] Firebase starting...");
+    }
+
+
+    // ---------------------------------------------
+    // FIREBASE UPDATE
+    // ---------------------------------------------
+
+    if (firebaseStarted) {
+      firebaseManager.update(now);
+    }
+
+
+    // ---------------------------------------------
     // ONLINE LED
-    // =================================================
+    //
+    // ใช้ LED ดวงเดียวกับ WiFi + Firebase
+    // ---------------------------------------------
 
-    if (wifiTask.isConnecting())
-    {
-        static unsigned long lastWiFiBlink = 0;
-        static bool wifiBlinkState = false;
+    if (wifiTask.isConnecting()) {
+      static unsigned long lastNetworkBlink = 0;
+      static bool networkBlinkState = false;
 
+      if (now - lastNetworkBlink >= 500) {
+        lastNetworkBlink = now;
 
-        if (now - lastWiFiBlink >= 500)
-        {
-            lastWiFiBlink = now;
+        networkBlinkState = !networkBlinkState;
 
-            wifiBlinkState = !wifiBlinkState;
-
-            statusLED.setOnline(
-                wifiBlinkState
-            );
-        }
-    }
-    else if (wifiTask.isConnected())
-    {
+        statusLED.setOnline(networkBlinkState);
+      }
+    } else if (wifiTask.isConnected()) {
+      if (firebaseManager.isReady()) {
+        // WiFi + Firebase พร้อม
         statusLED.setOnline(true);
-    }
-    else if (wifiTask.isOffline())
-    {
-        statusLED.setOnline(false);
-    }
+      } else {
+        // WiFi พร้อม แต่ Firebase ยังไม่พร้อม
+        static unsigned long lastFirebaseBlink = 0;
+        static bool firebaseBlinkState = false;
 
+        if (now - lastFirebaseBlink >= 500) {
+          lastFirebaseBlink = now;
 
-    // =================================================
-    // FRONT PANEL TASK
-    // =================================================
+          firebaseBlinkState = !firebaseBlinkState;
 
-    frontPanel.update(now);
-
-
-    // =================================================
-    // FRONT PANEL -> TASK MANAGER
-    // =================================================
-
-    if (frontPanel.hasTask() &&
-        !frontPanelTaskSubmitted)
-    {
-        if (taskManager.submit(
-                frontPanel.getTask()
-            ))
-        {
-            frontPanelTaskSubmitted = true;
-
-            // Task ใหม่ยังไม่ถูก Force Stop
-            hardwareForceStopped = false;
-
-
-            Serial.println(
-                "[MAIN] Front Panel Task submitted"
-            );
+          statusLED.setOnline(firebaseBlinkState);
         }
+      }
+    } else if (wifiTask.isOffline()) {
+      statusLED.setOnline(false);
     }
 
 
-    // =================================================
-    // TASK MANAGER
-    // =================================================
-
-    taskManager.update(now);
-
-
-    // =================================================
-    // FORCE HARDWARE OFF
-    // =================================================
+    // ---------------------------------------------
+    // SYSTEM READY
+    // ---------------------------------------------
     //
-    // ใช้สถานะจาก FrontPanelTask โดยตรง
+    // ต้องรอ:
     //
-    // เพราะตอนนี้ FrontPanelTask กับ TaskManager
-    // เป็น Task คนละ object
+    // WiFi + Firebase
     //
-    // FrontPanelTask จะเปลี่ยนเป็น FINISHED/STOPPED
-    // แต่ TaskManager อาจยังเห็น RUNNING
+    // หรือ WiFi timeout → Offline
     //
-    // ดังนั้นช่วงทดสอบ Main จะเป็นตัวสั่ง OFF
-    //
-    // =================================================
+    // ---------------------------------------------
 
-    if (frontPanelTaskSubmitted &&
-        !hardwareForceStopped)
-    {
-        TaskStatus frontPanelStatus =
-            frontPanel.getTask().getStatus();
+    bool networkReady =
+      wifiTask.isConnected() && firebaseManager.isReady();
+
+    bool networkOffline =
+      wifiTask.isOffline();
 
 
-        // ---------------------------------------------
-        // TASK FINISHED
-        // ---------------------------------------------
+    if (networkReady || networkOffline) {
+      systemReady = true;
 
-        if (frontPanelStatus == TaskStatus::FINISHED)
-        {
-            Serial.println(
-                "[MAIN] Front Panel Task FINISHED"
-            );
+      statusLED.setReady(true);
 
 
-            // -----------------------------------------
-            // FORCE HARDWARE OFF
-            // -----------------------------------------
-
-            disinfection.stop();
-
-            statusLED.stopWorking();
+      Serial.println();
+      Serial.println("==============================");
+      Serial.println("       SYSTEM READY");
+      Serial.println("==============================");
 
 
-            hardwareForceStopped = true;
+      if (networkReady) {
+        Serial.println("Network : ONLINE");
+        Serial.println("Firebase: READY");
+      } else {
+        Serial.println("Network : OFFLINE");
+        Serial.println("Firebase: NOT AVAILABLE");
+      }
 
 
-            Serial.println(
-                "[MAIN] FORCE OFF"
-            );
-
-            Serial.println(
-                "[MAIN] Relay OFF"
-            );
-
-            Serial.println(
-                "[MAIN] Motor OFF"
-            );
-
-            Serial.println(
-                "[MAIN] Working LED OFF"
-            );
-        }
-
-
-        // ---------------------------------------------
-        // TASK STOPPED
-        // ---------------------------------------------
-
-        else if (frontPanelStatus == TaskStatus::STOPPED)
-        {
-            Serial.println(
-                "[MAIN] Front Panel Task STOPPED"
-            );
-
-
-            // -----------------------------------------
-            // FORCE HARDWARE OFF
-            // -----------------------------------------
-
-            disinfection.stop();
-
-            statusLED.stopWorking();
-
-
-            hardwareForceStopped = true;
-
-
-            Serial.println(
-                "[MAIN] FORCE OFF"
-            );
-
-            Serial.println(
-                "[MAIN] Relay OFF"
-            );
-
-            Serial.println(
-                "[MAIN] Motor OFF"
-            );
-
-            Serial.println(
-                "[MAIN] Working LED OFF"
-            );
-        }
+      Serial.println();
     }
 
 
-    // =================================================
-    // DISPLAY
-    // =================================================
-
-    display.update(timer);
-
-
-    // =================================================
-    // BUZZER
-    // =================================================
+    // ---------------------------------------------
+    // OUTPUT SYSTEMS
+    // ---------------------------------------------
 
     buzzer.update(now);
 
-
-    // =================================================
-    // STATUS LED
-    // =================================================
-
     statusLED.update(now);
+
+
+    return;
+  }
+
+
+  // =================================================
+  // WIFI
+  // =================================================
+
+  wifiTask.update(now);
+
+  if (firebaseStarted) {
+    firebaseManager.update(now);
+  }
+
+
+  // =================================================
+  // ONLINE LED
+  // WiFi + Firebase
+  // =================================================
+  if (wifiTask.isConnecting()) {
+    static unsigned long lastNetworkBlink = 0;
+    static bool networkBlinkState = false;
+
+    if (now - lastNetworkBlink >= 500) {
+      lastNetworkBlink = now;
+
+      networkBlinkState = !networkBlinkState;
+
+      statusLED.setOnline(networkBlinkState);
+    }
+  } else if (wifiTask.isConnected()) {
+    if (firebaseManager.isReady()) {
+      statusLED.setOnline(true);
+    } else {
+      static unsigned long lastFirebaseBlink = 0;
+      static bool firebaseBlinkState = false;
+
+      if (now - lastFirebaseBlink >= 500) {
+        lastFirebaseBlink = now;
+
+        firebaseBlinkState = !firebaseBlinkState;
+
+        statusLED.setOnline(firebaseBlinkState);
+      }
+    }
+  } else {
+    statusLED.setOnline(false);
+  }
+
+
+  // =================================================
+  // FRONT PANEL TASK
+  // =================================================
+
+  frontPanel.update(now);
+
+
+  // =================================================
+  // TASK MANAGER
+  // =================================================
+
+  taskManager.update(now);
+
+
+  // =================================================
+  // DISPLAY
+  // =================================================
+
+  display.update(timer);
+
+
+  // =================================================
+  // BUZZER
+  // =================================================
+
+  buzzer.update(now);
+
+
+  // =================================================
+  // STATUS LED
+  // =================================================
+
+  statusLED.update(now);
 }
