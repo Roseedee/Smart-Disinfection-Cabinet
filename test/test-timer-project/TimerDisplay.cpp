@@ -110,3 +110,39 @@ void TimerDisplay::update(const Timer& timer)
 
     _display.setSegments(seg);
 }
+
+void TimerDisplay::updateLoading(unsigned long now)
+{
+    if (now - _lastLoadingUpdate < LOADING_INTERVAL)
+        return;
+
+    _lastLoadingUpdate = now;
+
+    const uint8_t allSegments =
+        SEG_A | SEG_B | SEG_C |
+        SEG_D | SEG_E | SEG_F;
+
+    uint8_t seg = allSegments;
+
+    // ตัดออกทีละ segment
+    switch (_loadingStep)
+    {
+        case 0: seg &= ~SEG_A; break;
+        case 1: seg &= ~SEG_B; break;
+        case 2: seg &= ~SEG_C; break;
+        case 3: seg &= ~SEG_D; break;
+        case 4: seg &= ~SEG_E; break;
+        case 5: seg &= ~SEG_F; break;
+    }
+
+    uint8_t segments[4] = {
+        seg, seg, seg, seg
+    };
+
+    _display.setSegments(segments);
+
+    _loadingStep++;
+
+    if (_loadingStep >= 6)
+        _loadingStep = 0;
+}

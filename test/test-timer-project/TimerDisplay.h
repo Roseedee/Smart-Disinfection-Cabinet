@@ -20,10 +20,16 @@ public:
 
     void update(const Timer& timer);
 
+    void updateLoading(unsigned long now);
 
 private:
 
     TM1637Display _display;
+
+    unsigned long _lastLoadingUpdate = 0;
+    uint8_t _loadingStep = 0;
+
+    static constexpr unsigned long LOADING_INTERVAL = 120;
 };
 
 #endif
