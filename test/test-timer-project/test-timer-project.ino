@@ -246,6 +246,10 @@ void setup() {
 // LOOP
 // =====================================================
 
+// =====================================================
+// LOOP
+// =====================================================
+
 void loop() {
   unsigned long now = millis();
 
@@ -255,6 +259,7 @@ void loop() {
   // =================================================
 
   if (!systemReady) {
+
     // ---------------------------------------------
     // 7SEG BOOT SPINNER
     // ---------------------------------------------
@@ -274,6 +279,7 @@ void loop() {
     // ---------------------------------------------
 
     if (wifiTask.isConnected() && !firebaseStarted) {
+
       firebaseManager.begin();
 
       firebaseStarted = true;
@@ -293,31 +299,38 @@ void loop() {
 
     // ---------------------------------------------
     // ONLINE LED
-    //
-    // ใช้ LED ดวงเดียวกับ WiFi + Firebase
+    // WiFi + Firebase
     // ---------------------------------------------
 
     if (wifiTask.isConnecting()) {
+
       static unsigned long lastNetworkBlink = 0;
       static bool networkBlinkState = false;
 
       if (now - lastNetworkBlink >= 500) {
+
         lastNetworkBlink = now;
 
         networkBlinkState = !networkBlinkState;
 
         statusLED.setOnline(networkBlinkState);
       }
+
     } else if (wifiTask.isConnected()) {
+
       if (firebaseManager.isReady()) {
+
         // WiFi + Firebase พร้อม
         statusLED.setOnline(true);
+
       } else {
+
         // WiFi พร้อม แต่ Firebase ยังไม่พร้อม
         static unsigned long lastFirebaseBlink = 0;
         static bool firebaseBlinkState = false;
 
         if (now - lastFirebaseBlink >= 500) {
+
           lastFirebaseBlink = now;
 
           firebaseBlinkState = !firebaseBlinkState;
@@ -325,31 +338,40 @@ void loop() {
           statusLED.setOnline(firebaseBlinkState);
         }
       }
+
     } else if (wifiTask.isOffline()) {
+
       statusLED.setOnline(false);
     }
 
 
     // ---------------------------------------------
     // SYSTEM READY
-    // ---------------------------------------------
     //
     // ต้องรอ:
     //
     // WiFi + Firebase
     //
-    // หรือ WiFi timeout → Offline
+    // หรือ
     //
+    // WiFi Offline
+    //
+    // หรือ
+    //
+    // Firebase Timeout
     // ---------------------------------------------
 
     bool networkReady =
-      wifiTask.isConnected() && firebaseManager.isReady();
+      wifiTask.isConnected() &&
+      firebaseManager.isReady();
 
     bool networkOffline =
-      wifiTask.isOffline();
+      wifiTask.isOffline() ||
+      firebaseManager.isTimeout();
 
 
     if (networkReady || networkOffline) {
+
       systemReady = true;
 
       statusLED.setReady(true);
@@ -362,11 +384,21 @@ void loop() {
 
 
       if (networkReady) {
+
         Serial.println("Network : ONLINE");
         Serial.println("Firebase: READY");
+
       } else {
+
         Serial.println("Network : OFFLINE");
-        Serial.println("Firebase: NOT AVAILABLE");
+
+        if (wifiTask.isOffline()) {
+          Serial.println("WiFi    : OFFLINE");
+        }
+
+        if (firebaseManager.isTimeout()) {
+          Serial.println("Firebase: TIMEOUT");
+        }
       }
 
 
@@ -393,6 +425,11 @@ void loop() {
 
   wifiTask.update(now);
 
+
+  // =================================================
+  // FIREBASE
+  // =================================================
+
   if (firebaseStarted) {
     firebaseManager.update(now);
   }
@@ -402,25 +439,34 @@ void loop() {
   // ONLINE LED
   // WiFi + Firebase
   // =================================================
+
   if (wifiTask.isConnecting()) {
+
     static unsigned long lastNetworkBlink = 0;
     static bool networkBlinkState = false;
 
     if (now - lastNetworkBlink >= 500) {
+
       lastNetworkBlink = now;
 
       networkBlinkState = !networkBlinkState;
 
       statusLED.setOnline(networkBlinkState);
     }
+
   } else if (wifiTask.isConnected()) {
+
     if (firebaseManager.isReady()) {
+
       statusLED.setOnline(true);
+
     } else {
+
       static unsigned long lastFirebaseBlink = 0;
       static bool firebaseBlinkState = false;
 
       if (now - lastFirebaseBlink >= 500) {
+
         lastFirebaseBlink = now;
 
         firebaseBlinkState = !firebaseBlinkState;
@@ -428,7 +474,9 @@ void loop() {
         statusLED.setOnline(firebaseBlinkState);
       }
     }
+
   } else {
+
     statusLED.setOnline(false);
   }
 

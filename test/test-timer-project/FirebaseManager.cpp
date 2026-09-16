@@ -22,7 +22,9 @@ FirebaseManager::FirebaseManager(
     _password(password),
     _deviceSN(deviceSN),
     _ready(false),
-    _lastSeenUpdate(0) {
+    _lastSeenUpdate(0),
+    _startTime(0),
+    _timeout(false) {
 }
 
 
@@ -54,6 +56,8 @@ void FirebaseManager::begin() {
 
   Firebase.reconnectWiFi(true);
 
+  _startTime = millis();
+  _timeout = false;
 
   // NTP Time Sync - Thailand GMT+7
   configTime(
@@ -70,95 +74,98 @@ void FirebaseManager::begin() {
 // UPDATE
 // =====================================================
 
-void FirebaseManager::update(unsigned long now)
-{
-    // ---------------------------------------------
-    // CHECK WIFI
-    // ---------------------------------------------
+void FirebaseManager::update(unsigned long now) {
+  // ---------------------------------------------
+  // CHECK WIFI
+  // ---------------------------------------------
 
-    if (WiFi.status() != WL_CONNECTED)
-    {
-        _ready = false;
-        return;
+  if (WiFi.status() != WL_CONNECTED) {
+    _ready = false;
+    return;
+  }
+
+
+  // ---------------------------------------------
+  // CHECK FIREBASE
+  // ---------------------------------------------
+
+  if (!Firebase.ready()) {
+    _ready = false;
+
+    if (!_timeout && now - _startTime >= FIREBASE_CONNECT_TIMEOUT) {
+      _timeout = true;
+
+      Serial.println();
+      Serial.println("[Firebase] CONNECTION TIMEOUT");
+      Serial.println("[Firebase] OFFLINE MODE");
     }
 
-
-    // ---------------------------------------------
-    // CHECK FIREBASE
-    // ---------------------------------------------
-
-    if (!Firebase.ready())
-    {
-        _ready = false;
-        return;
-    }
+    return;
+  }
 
 
-    // ---------------------------------------------
-    // FIREBASE READY
-    // ---------------------------------------------
+  // ---------------------------------------------
+  // FIREBASE READY
+  // ---------------------------------------------
 
-    if (!_ready)
-    {
-        _ready = true;
+  if (!_ready) {
+    _ready = true;
 
-        Serial.println();
-        Serial.println("[Firebase] READY");
-        Serial.print("[Firebase] Device SN: ");
-        Serial.println(_deviceSN);
-    }
-
-
-    // ---------------------------------------------
-    // LAST SEEN INTERVAL
-    // ---------------------------------------------
-
-    if (now - _lastSeenUpdate < LASTSEEN_INTERVAL)
-        return;
+    Serial.println();
+    Serial.println("[Firebase] READY");
+    Serial.print("[Firebase] Device SN: ");
+    Serial.println(_deviceSN);
+  }
 
 
-    // ---------------------------------------------
-    // GET NTP TIME
-    // ---------------------------------------------
+  // ---------------------------------------------
+  // LAST SEEN INTERVAL
+  // ---------------------------------------------
 
-    struct tm timeinfo;
-
-    if (!getLocalTime(&timeinfo, 1000))
-    {
-        Serial.println("[NTP] Time not ready");
-        return;
-    }
+  if (now - _lastSeenUpdate < LASTSEEN_INTERVAL)
+    return;
 
 
-    // ---------------------------------------------
-    // UNIX TIMESTAMP
-    // ---------------------------------------------
+  // ---------------------------------------------
+  // GET NTP TIME
+  // ---------------------------------------------
 
-    time_t timestamp = time(nullptr);
+  struct tm timeinfo;
 
-
-    // ---------------------------------------------
-    // DEBUG TIME
-    // ---------------------------------------------
-
-    Serial.printf(
-        "[NTP] %04d-%02d-%02d %02d:%02d:%02d\n",
-        timeinfo.tm_year + 1900,
-        timeinfo.tm_mon + 1,
-        timeinfo.tm_mday,
-        timeinfo.tm_hour,
-        timeinfo.tm_min,
-        timeinfo.tm_sec
-    );
+  if (!getLocalTime(&timeinfo, 1000)) {
+    Serial.println("[NTP] Time not ready");
+    return;
+  }
 
 
-    // ---------------------------------------------
-    // UPDATE LAST SEEN
-    // ---------------------------------------------
+  // ---------------------------------------------
+  // UNIX TIMESTAMP
+  // ---------------------------------------------
 
-    updateLastSeen(timestamp);
+  time_t timestamp = time(nullptr);
 
-    _lastSeenUpdate = now;
+
+  // ---------------------------------------------
+  // DEBUG TIME
+  // ---------------------------------------------
+
+  Serial.printf(
+    "[NTP] %04d-%02d-%02d %02d:%02d:%02d\n",
+    timeinfo.tm_year + 1900,
+    timeinfo.tm_mon + 1,
+    timeinfo.tm_mday,
+    timeinfo.tm_hour,
+    timeinfo.tm_min,
+    timeinfo.tm_sec);
+
+
+  // ---------------------------------------------
+  // UPDATE LAST SEEN
+  // ---------------------------------------------
+
+  updateLastSeen(timestamp);
+
+  _lastSeenUpdate = now;
 }
 
 // =====================================================
@@ -169,25 +176,24 @@ bool FirebaseManager::isReady() const {
   return _ready;
 }
 
-
-void FirebaseManager::updateLastSeen(time_t timestamp)
+bool FirebaseManager::isTimeout() const
 {
-    String path = "/devices/";
-    path += _deviceSN;
-    path += "/lastseen";
+    return _timeout;
+}
 
-    if (Firebase.RTDB.setInt(
-            &_fbdo,
-            path.c_str(),
-            (int)timestamp
-        ))
-    {
-        Serial.print("[Firebase] lastseen: ");
-        Serial.println((long)timestamp);
-    }
-    else
-    {
-        Serial.print("[Firebase] lastseen FAILED: ");
-        Serial.println(_fbdo.errorReason());
-    }
+void FirebaseManager::updateLastSeen(time_t timestamp) {
+  String path = "/devices/";
+  path += _deviceSN;
+  path += "/lastseen";
+
+  if (Firebase.RTDB.setInt(
+        &_fbdo,
+        path.c_str(),
+        (int)timestamp)) {
+    Serial.print("[Firebase] lastseen: ");
+    Serial.println((long)timestamp);
+  } else {
+    Serial.print("[Firebase] lastseen FAILED: ");
+    Serial.println(_fbdo.errorReason());
+  }
 }

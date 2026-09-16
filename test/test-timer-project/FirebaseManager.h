@@ -4,6 +4,8 @@
 #include <Arduino.h>
 #include <Firebase_ESP_Client.h>
 
+#define FIREBASE_CONNECT_TIMEOUT 15000
+
 class FirebaseManager {
 public:
 
@@ -19,8 +21,12 @@ public:
   void update(unsigned long now);
 
   bool isReady() const;
+  bool isTimeout() const;
 
 private:
+
+  unsigned long _startTime;
+  bool _timeout;
 
   void updateLastSeen(time_t timestamp);
 
