@@ -6,45 +6,87 @@
 
 #define FIREBASE_CONNECT_TIMEOUT 15000
 
-class FirebaseManager {
+class FirebaseFrontPanelTask;
+class StatusLED;
+
+class FirebaseManager
+{
 public:
 
-  FirebaseManager(
-    const char* apiKey,
-    const char* databaseUrl,
-    const char* email,
-    const char* password,
-    const char* deviceSN);
+    FirebaseManager(
+        const char* apiKey,
+        const char* databaseUrl,
+        const char* email,
+        const char* password,
+        const char* deviceSN,
+        StatusLED& statusLED
+    );
 
-  void begin();
+    void begin();
 
-  void update(unsigned long now);
+    void update(
+        unsigned long now,
+        FirebaseFrontPanelTask& firebaseTask
+    );
 
-  bool isReady() const;
-  bool isTimeout() const;
+    bool isReady() const;
+
+    bool isTimeout() const;
+
 
 private:
 
-  unsigned long _startTime;
-  bool _timeout;
+    StatusLED& _statusLED;
 
-  void updateLastSeen(time_t timestamp);
+    void updateLastSeen(
+        time_t timestamp
+    );
 
-  const char* _apiKey;
-  const char* _databaseUrl;
-  const char* _email;
-  const char* _password;
-  const char* _deviceSN;
+    void updateTask(
+        unsigned long now,
+        FirebaseFrontPanelTask& firebaseTask
+    );
 
-  FirebaseData _fbdo;
-  FirebaseAuth _auth;
-  FirebaseConfig _config;
+    void updateTaskValues(
+        const String& path,
+        const char* status,
+        bool isRunning,
+        const char* command,
+        uint32_t remaining,
+        uint8_t progress
+    );
 
-  bool _ready;
+    void deleteTask(
+        const String& path
+    );
 
-  unsigned long _lastSeenUpdate;
 
-  static const unsigned long LASTSEEN_INTERVAL = 5000;
+    const char* _apiKey;
+    const char* _databaseUrl;
+    const char* _email;
+    const char* _password;
+    const char* _deviceSN;
+
+
+    FirebaseData _fbdo;
+    FirebaseAuth _auth;
+    FirebaseConfig _config;
+
+
+    bool _ready;
+
+    unsigned long _lastSeenUpdate;
+
+    static const unsigned long LASTSEEN_INTERVAL = 5000;
+
+
+    unsigned long _startTime;
+    bool _timeout;
+
+
+    unsigned long _lastTaskCheck;
+
+    static const unsigned long TASK_CHECK_INTERVAL = 1000;
 };
 
 #endif

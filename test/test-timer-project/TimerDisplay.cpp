@@ -111,6 +111,33 @@ void TimerDisplay::update(const Timer& timer)
     _display.setSegments(seg);
 }
 
+// =====================================================
+// UPDATE SECONDS
+// =====================================================
+
+void TimerDisplay::updateSeconds(
+    uint32_t totalSeconds
+)
+{
+    uint32_t minutes =
+        totalSeconds / 60;
+
+    uint32_t seconds =
+        totalSeconds % 60;
+
+
+    uint16_t value =
+        (minutes * 100) +
+        seconds;
+
+
+    _display.showNumberDecEx(
+        value,
+        0b01000000,
+        true
+    );
+}
+
 void TimerDisplay::updateLoading(unsigned long now)
 {
     if (now - _lastLoadingUpdate < LOADING_INTERVAL)

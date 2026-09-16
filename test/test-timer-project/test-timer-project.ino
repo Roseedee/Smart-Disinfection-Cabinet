@@ -14,6 +14,7 @@
 #include "TaskManager.h"
 #include "FirebaseManager.h"
 #include "FirebaseConfig.h"
+#include "FirebaseFrontPanelTask.h"
 
 
 
@@ -143,7 +144,8 @@ FirebaseManager firebaseManager(
   FIREBASE_DATABASE_URL,
   FIREBASE_EMAIL,
   FIREBASE_PASSWORD,
-  DEVICE_SN);
+  DEVICE_SN,
+  statusLED);
 
 // =====================================================
 // DISINFECTION CONTROLLER
@@ -176,6 +178,15 @@ FrontPanelTask frontPanel(
   buzzer,
   taskManager);
 
+
+
+FirebaseFrontPanelTask firebaseFrontPanel(
+    buttons,
+    buzzer,
+    taskManager,
+    timer,
+    display
+);
 
 // =====================================================
 // SYSTEM STATE
@@ -218,6 +229,8 @@ void setup() {
 
   taskManager.begin();
 
+  firebaseFrontPanel.begin();
+
 
   // =================================================
   // SYSTEM NOT READY
@@ -245,273 +258,245 @@ void setup() {
 // =====================================================
 // LOOP
 // =====================================================
-
-// =====================================================
-// LOOP
-// =====================================================
-
-void loop() {
-  unsigned long now = millis();
+void loop()
+{
+    unsigned long now = millis();
 
 
-  // =================================================
-  // BOOT
-  // =================================================
+    // =====================================================
+    // BOOT
+    // =====================================================
 
-  if (!systemReady) {
+    if (!systemReady)
+    {
+        display.updateLoading(now);
 
-    // ---------------------------------------------
-    // 7SEG BOOT SPINNER
-    // ---------------------------------------------
-
-    display.updateLoading(now);
+        wifiTask.update(now);
 
 
-    // ---------------------------------------------
+        if (
+            wifiTask.isConnected() &&
+            !firebaseStarted
+        )
+        {
+            firebaseManager.begin();
+
+            firebaseStarted = true;
+
+            Serial.println(
+                "[SYSTEM] Firebase starting..."
+            );
+        }
+
+
+        if (firebaseStarted)
+        {
+            firebaseManager.update(
+                now,
+                firebaseFrontPanel
+            );
+        }
+
+
+        // -------------------------------------------------
+        // ONLINE LED
+        // -------------------------------------------------
+
+        if (wifiTask.isConnecting())
+        {
+            static unsigned long lastNetworkBlink = 0;
+            static bool networkBlinkState = false;
+
+            if (
+                now - lastNetworkBlink >= 500
+            )
+            {
+                lastNetworkBlink = now;
+
+                networkBlinkState =
+                    !networkBlinkState;
+
+                statusLED.setOnline(
+                    networkBlinkState
+                );
+            }
+        }
+        else if (
+            wifiTask.isConnected()
+        )
+        {
+            statusLED.setOnline(true);
+        }
+        else if (
+            wifiTask.isOffline()
+        )
+        {
+            statusLED.setOnline(false);
+        }
+
+
+        // -------------------------------------------------
+        // SYSTEM READY
+        // -------------------------------------------------
+
+        bool networkReady =
+            wifiTask.isConnected() &&
+            firebaseManager.isReady();
+
+        bool networkOffline =
+            wifiTask.isOffline() ||
+            firebaseManager.isTimeout();
+
+
+        if (
+            networkReady ||
+            networkOffline
+        )
+        {
+            systemReady = true;
+
+            statusLED.setReady(true);
+
+            Serial.println();
+            Serial.println(
+                "=============================="
+            );
+            Serial.println(
+                "       SYSTEM READY"
+            );
+            Serial.println(
+                "=============================="
+            );
+
+            if (networkReady)
+            {
+                Serial.println(
+                    "Network : ONLINE"
+                );
+            }
+            else
+            {
+                Serial.println(
+                    "Network : OFFLINE"
+                );
+            }
+
+            Serial.println();
+        }
+
+
+        buzzer.update(now);
+        statusLED.update(now);
+
+        return;
+    }
+
+
+    // =====================================================
     // WIFI
-    // ---------------------------------------------
+    // =====================================================
 
     wifiTask.update(now);
 
 
-    // ---------------------------------------------
-    // START FIREBASE
-    // ---------------------------------------------
+    // =====================================================
+    // FIREBASE
+    // =====================================================
 
-    if (wifiTask.isConnected() && !firebaseStarted) {
-
-      firebaseManager.begin();
-
-      firebaseStarted = true;
-
-      Serial.println("[SYSTEM] Firebase starting...");
+    if (firebaseStarted)
+    {
+        firebaseManager.update(
+            now,
+            firebaseFrontPanel
+        );
     }
 
 
-    // ---------------------------------------------
-    // FIREBASE UPDATE
-    // ---------------------------------------------
-
-    if (firebaseStarted) {
-      firebaseManager.update(now);
-    }
-
-
-    // ---------------------------------------------
+    // =====================================================
     // ONLINE LED
-    // WiFi + Firebase
-    // ---------------------------------------------
+    // =====================================================
 
-    if (wifiTask.isConnecting()) {
+    if (wifiTask.isConnecting())
+    {
+        static unsigned long lastWiFiBlink = 0;
+        static bool wifiBlinkState = false;
 
-      static unsigned long lastNetworkBlink = 0;
-      static bool networkBlinkState = false;
+        if (
+            now - lastWiFiBlink >= 500
+        )
+        {
+            lastWiFiBlink = now;
 
-      if (now - lastNetworkBlink >= 500) {
+            wifiBlinkState =
+                !wifiBlinkState;
 
-        lastNetworkBlink = now;
-
-        networkBlinkState = !networkBlinkState;
-
-        statusLED.setOnline(networkBlinkState);
-      }
-
-    } else if (wifiTask.isConnected()) {
-
-      if (firebaseManager.isReady()) {
-
-        // WiFi + Firebase พร้อม
+            statusLED.setOnline(
+                wifiBlinkState
+            );
+        }
+    }
+    else if (
+        wifiTask.isConnected()
+    )
+    {
         statusLED.setOnline(true);
-
-      } else {
-
-        // WiFi พร้อม แต่ Firebase ยังไม่พร้อม
-        static unsigned long lastFirebaseBlink = 0;
-        static bool firebaseBlinkState = false;
-
-        if (now - lastFirebaseBlink >= 500) {
-
-          lastFirebaseBlink = now;
-
-          firebaseBlinkState = !firebaseBlinkState;
-
-          statusLED.setOnline(firebaseBlinkState);
-        }
-      }
-
-    } else if (wifiTask.isOffline()) {
-
-      statusLED.setOnline(false);
+    }
+    else
+    {
+        statusLED.setOnline(false);
     }
 
 
-    // ---------------------------------------------
-    // SYSTEM READY
-    //
-    // ต้องรอ:
-    //
-    // WiFi + Firebase
-    //
-    // หรือ
-    //
-    // WiFi Offline
-    //
-    // หรือ
-    //
-    // Firebase Timeout
-    // ---------------------------------------------
+    // =====================================================
+    // FIREBASE FRONT PANEL
+    // =====================================================
 
-    bool networkReady =
-      wifiTask.isConnected() &&
-      firebaseManager.isReady();
-
-    bool networkOffline =
-      wifiTask.isOffline() ||
-      firebaseManager.isTimeout();
+    firebaseFrontPanel.update(now);
 
 
-    if (networkReady || networkOffline) {
+    // =====================================================
+    // NORMAL FRONT PANEL
+    // =====================================================
 
-      systemReady = true;
-
-      statusLED.setReady(true);
-
-
-      Serial.println();
-      Serial.println("==============================");
-      Serial.println("       SYSTEM READY");
-      Serial.println("==============================");
-
-
-      if (networkReady) {
-
-        Serial.println("Network : ONLINE");
-        Serial.println("Firebase: READY");
-
-      } else {
-
-        Serial.println("Network : OFFLINE");
-
-        if (wifiTask.isOffline()) {
-          Serial.println("WiFi    : OFFLINE");
-        }
-
-        if (firebaseManager.isTimeout()) {
-          Serial.println("Firebase: TIMEOUT");
-        }
-      }
-
-
-      Serial.println();
+    if (!firebaseFrontPanel.hasTask())
+    {
+        frontPanel.update(now);
     }
 
 
-    // ---------------------------------------------
-    // OUTPUT SYSTEMS
-    // ---------------------------------------------
+    // =====================================================
+    // TASK MANAGER
+    // =====================================================
+
+    taskManager.update(now);
+
+
+    // =====================================================
+    // DISPLAY
+    // =====================================================
+
+    if (firebaseFrontPanel.hasTask())
+    {
+        // Firebase Task
+        firebaseFrontPanel.update(now);
+    }
+    else
+    {
+        // Front Panel Task
+        display.update(timer);
+    }
+
+
+    // =====================================================
+    // BUZZER
+    // =====================================================
 
     buzzer.update(now);
 
+
+    // =====================================================
+    // STATUS LED
+    // =====================================================
+
     statusLED.update(now);
-
-
-    return;
-  }
-
-
-  // =================================================
-  // WIFI
-  // =================================================
-
-  wifiTask.update(now);
-
-
-  // =================================================
-  // FIREBASE
-  // =================================================
-
-  if (firebaseStarted) {
-    firebaseManager.update(now);
-  }
-
-
-  // =================================================
-  // ONLINE LED
-  // WiFi + Firebase
-  // =================================================
-
-  if (wifiTask.isConnecting()) {
-
-    static unsigned long lastNetworkBlink = 0;
-    static bool networkBlinkState = false;
-
-    if (now - lastNetworkBlink >= 500) {
-
-      lastNetworkBlink = now;
-
-      networkBlinkState = !networkBlinkState;
-
-      statusLED.setOnline(networkBlinkState);
-    }
-
-  } else if (wifiTask.isConnected()) {
-
-    if (firebaseManager.isReady()) {
-
-      statusLED.setOnline(true);
-
-    } else {
-
-      static unsigned long lastFirebaseBlink = 0;
-      static bool firebaseBlinkState = false;
-
-      if (now - lastFirebaseBlink >= 500) {
-
-        lastFirebaseBlink = now;
-
-        firebaseBlinkState = !firebaseBlinkState;
-
-        statusLED.setOnline(firebaseBlinkState);
-      }
-    }
-
-  } else {
-
-    statusLED.setOnline(false);
-  }
-
-
-  // =================================================
-  // FRONT PANEL TASK
-  // =================================================
-
-  frontPanel.update(now);
-
-
-  // =================================================
-  // TASK MANAGER
-  // =================================================
-
-  taskManager.update(now);
-
-
-  // =================================================
-  // DISPLAY
-  // =================================================
-
-  display.update(timer);
-
-
-  // =================================================
-  // BUZZER
-  // =================================================
-
-  buzzer.update(now);
-
-
-  // =================================================
-  // STATUS LED
-  // =================================================
-
-  statusLED.update(now);
 }

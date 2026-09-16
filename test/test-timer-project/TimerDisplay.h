@@ -20,6 +20,8 @@ public:
 
     void update(const Timer& timer);
 
+    void updateSeconds(uint32_t totalSeconds);
+
     void updateLoading(unsigned long now);
 
 private:
