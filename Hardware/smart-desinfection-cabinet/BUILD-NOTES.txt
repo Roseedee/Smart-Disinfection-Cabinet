@@ -1,0 +1,13 @@
+Build notes
+
+1. Open Smart-Disinfection-Cabinet.ino in Arduino IDE.
+2. Keep all .cpp/.h files in the same sketch folder.
+3. Install the required libraries listed in README.md.
+4. Select the correct ESP32 board and COM port.
+5. FirebaseConfig.h is already populated from the supplied project config.
+
+Architecture note:
+FirebaseManager uses a FreeRTOS background task on ESP32 core 0. The Arduino loop remains responsible for front-panel and hardware control. Firebase network calls are not made from loop().
+
+Hardware note:
+GPIO34 is input-only and requires the external 10K pull-up described in README-door-safety.txt.

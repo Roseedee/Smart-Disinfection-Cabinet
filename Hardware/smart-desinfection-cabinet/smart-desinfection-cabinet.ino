@@ -1,90 +1,177 @@
 #include <Arduino.h>
+#include <WiFi.h>
 
-#include "WiFiManager.h"
-#include "SegmentDisplay.h"
+#include "Timer.h"
+#include "Buttons.h"
+#include "TimerDisplay.h"
+#include "Buzzer.h"
+#include "StatusLED.h"
+#include "WiFiTask.h"
+#include "SensorManager.h"
 
-
-// =====================================================
-// WIFI CONFIG
-// =====================================================
-
-const char* WIFI_SSID =
-    "Dee";
-
-const char* WIFI_PASSWORD =
-    "20022002";
-
-
-// =====================================================
-// LED
-// =====================================================
-
-#define LED_CONNECTING  21
-#define LED_ONLINE      19
-#define LED_OFFLINE      5
+#include "DisinfectionController.h"
+#include "Task.h"
+#include "FrontPanelTask.h"
+#include "TaskManager.h"
+#include "FirebaseManager.h"
+#include "FirebaseConfig.h"
+#include "FirebaseFrontPanelTask.h"
 
 
 // =====================================================
-// RELAY
+// DEVICE
 // =====================================================
 
-#define RELAY_PIN       15
-
-#define RELAY_OFF       LOW
-#define RELAY_ON        HIGH
+#define DEVICE_SN "AWE416E1W61"
 
 
 // =====================================================
-// TM1637
+// WIFI
 // =====================================================
 
-#define DISPLAY_CLK     14
-#define DISPLAY_DIO     13
+#define WIFI_SSID "SDC"
+#define WIFI_PASSWORD "00000000"
 
 
 // =====================================================
-// OBJECT
+// PIN
 // =====================================================
 
-WiFiManager wifi(
+#define TM1637_CLK 14
+#define TM1637_DIO 13
+
+#define BUTTON_START_STOP 27
+#define BUTTON_UP         26
+#define BUTTON_DOWN       25
+#define BUTTON_SET        33
+
+#define READY_LED   22
+#define ONLINE_LED  21
+#define WORKING_LED 5
+
+#define BUZZER_PIN 18
+
+#define LAMP1_PIN 15
+#define LAMP2_PIN 4
+#define LAMP3_PIN 16
+#define LAMP4_PIN 17
+
+#define MOTOR_PIN 19
+
+
+// -----------------------------------------------------
+// SENSOR
+// -----------------------------------------------------
+
+#define UV_SENSOR_PIN 32
+#define DHT11_PIN     23
+#define DOOR_SW_PIN   34
+
+
+// =====================================================
+// COMPONENTS
+// =====================================================
+
+StatusLED statusLED(
+    READY_LED,
+    ONLINE_LED,
+    WORKING_LED
+);
+
+Timer timer;
+
+Buttons buttons(
+    BUTTON_START_STOP,
+    BUTTON_UP,
+    BUTTON_DOWN,
+    BUTTON_SET
+);
+
+TimerDisplay display(
+    TM1637_CLK,
+    TM1637_DIO
+);
+
+Buzzer buzzer(
+    BUZZER_PIN
+);
+
+WiFiTask wifiTask(
     WIFI_SSID,
-    WIFI_PASSWORD,
-    15000,
-    30000
+    WIFI_PASSWORD
+);
+
+DisinfectionController disinfection(
+    LAMP1_PIN,
+    LAMP2_PIN,
+    LAMP3_PIN,
+    LAMP4_PIN,
+    MOTOR_PIN
+);
+
+TaskManager taskManager(
+    disinfection,
+    statusLED
+);
+
+FrontPanelTask frontPanel(
+    buttons,
+    timer,
+    buzzer,
+    taskManager
+);
+
+FirebaseFrontPanelTask firebaseFrontPanel(
+    buttons,
+    buzzer,
+    taskManager,
+    timer,
+    display
+);
+
+SensorManager sensors(
+    UV_SENSOR_PIN,
+    DHT11_PIN,
+    DOOR_SW_PIN
+);
+
+FirebaseManager firebaseManager(
+    FIREBASE_API_KEY,
+    FIREBASE_DATABASE_URL,
+    FIREBASE_EMAIL,
+    FIREBASE_PASSWORD,
+    DEVICE_SN,
+    statusLED
 );
 
 
-SegmentDisplay display(
-    DISPLAY_CLK,
-    DISPLAY_DIO
-);
+// =====================================================
+// SYSTEM STATE
+// =====================================================
+
+bool systemReady = false;
+bool firebaseStarted = false;
 
 
 // =====================================================
-// LED TIMER
+// DOOR SAFETY
 // =====================================================
 
-unsigned long ledTimer = 0;
+void updateDoorSafety(
+    bool doorOpen,
+    unsigned long now
+)
+{
+    // Physical timer and Firebase task timer share the same door safety rule.
+    timer.setSafetyPause(doorOpen);
+    firebaseFrontPanel.setSafetyPause(doorOpen);
 
-bool ledBlinkState = false;
-
-
-// =====================================================
-// SYSTEM TIMER
-// =====================================================
-
-unsigned long systemTimer = 0;
-
-
-// =====================================================
-// FUNCTION
-// =====================================================
-
-void setupRelay();
-
-void updateNetworkLED();
-
-void handleSystem();
+    // TaskManager คือด่านสุดท้ายของ Hardware
+    taskManager.setDoorOpen(
+        doorOpen,
+        now
+    );
+}
 
 
 // =====================================================
@@ -99,69 +186,74 @@ void setup()
 
 
     Serial.println();
-    Serial.println("================================");
-    Serial.println("SMART DISINFECTION CABINET");
-    Serial.println("================================");
-
-
-    // =================================================
-    // RELAY
-    // =================================================
-
-    setupRelay();
-
-
-    // =================================================
-    // LED
-    // =================================================
-
-    pinMode(
-        LED_CONNECTING,
-        OUTPUT
+    Serial.println(
+        "=============================="
     );
-
-    pinMode(
-        LED_ONLINE,
-        OUTPUT
+    Serial.println(
+        " Smart Disinfection Cabinet"
     );
-
-    pinMode(
-        LED_OFFLINE,
-        OUTPUT
-    );
-
-
-    digitalWrite(
-        LED_CONNECTING,
-        LOW
-    );
-
-    digitalWrite(
-        LED_ONLINE,
-        LOW
-    );
-
-    digitalWrite(
-        LED_OFFLINE,
-        LOW
+    Serial.println(
+        "=============================="
     );
 
 
     // =================================================
-    // DISPLAY
+    // HARDWARE INIT
     // =================================================
 
+    buttons.begin();
     display.begin();
+    buzzer.begin();
+    timer.begin();
+    statusLED.begin();
+    disinfection.begin();
+    taskManager.begin();
+    firebaseFrontPanel.begin();
+    sensors.begin();
+
+
+    // =================================================
+    // INITIAL DOOR SAFETY
+    // =================================================
+
+    bool initialDoorOpen =
+        sensors.isDoorOpen();
+
+    updateDoorSafety(
+        initialDoorOpen,
+        millis()
+    );
+
+    Serial.print("[SYSTEM] Door: ");
+    Serial.println(
+        initialDoorOpen ? "OPEN" : "CLOSED"
+    );
+
+
+    // =================================================
+    // SYSTEM NOT READY
+    // =================================================
+
+    systemReady = false;
+
+    statusLED.setReady(false);
+    statusLED.setOnline(false);
 
 
     // =================================================
     // WIFI
     // =================================================
 
-    wifi.begin();
+    wifiTask.begin();
 
 
-    Serial.println("[SYSTEM] READY");
+    Serial.println(
+        "[SYSTEM] Booting..."
+    );
+
+    Serial.println(
+        "[SYSTEM] Waiting for WiFi result..."
+    );
 }
 
 
@@ -169,199 +261,256 @@ void setup()
 // LOOP
 // =====================================================
 
-unsigned long countTimer = 0;
-int numberCount = 0;
 void loop()
 {
+    unsigned long now = millis();
+
+
+    // =================================================
+    // SENSOR + DOOR SAFETY
+    // =================================================
+
+    sensors.update(now);
+
+    bool doorOpen =
+        sensors.isDoorOpen();
+
+    // ต้องทำทุก loop และต้องทำก่อน
+    // FirebaseFrontPanelTask / FrontPanelTask
+    updateDoorSafety(
+        doorOpen,
+        now
+    );
+
+
+    // =================================================
+    // BOOT
+    // =================================================
+
+    if (!systemReady)
+    {
+        display.updateLoading(now);
+
+        wifiTask.update(now);
+
+
+        // ---------------------------------------------
+        // START FIREBASE
+        // ---------------------------------------------
+
+        if (
+            wifiTask.isConnected() &&
+            !firebaseStarted
+        )
+        {
+            firebaseManager.begin();
+
+            firebaseStarted = true;
+
+            Serial.println(
+                "[SYSTEM] Firebase starting..."
+            );
+        }
+
+
+        // ---------------------------------------------
+        // FIREBASE
+        // ---------------------------------------------
+
+        if (firebaseStarted)
+        {
+            firebaseManager.update(
+                now,
+                firebaseFrontPanel,
+                disinfection,
+                taskManager,
+                sensors
+            );
+        }
+
+
+        // ---------------------------------------------
+        // ONLINE LED
+        // ---------------------------------------------
+
+        if (wifiTask.isConnecting())
+        {
+            static unsigned long lastNetworkBlink = 0;
+            static bool networkBlinkState = false;
+
+            if (now - lastNetworkBlink >= 500)
+            {
+                lastNetworkBlink = now;
+                networkBlinkState = !networkBlinkState;
+
+                statusLED.setOnline(
+                    networkBlinkState
+                );
+            }
+        }
+        else if (wifiTask.isConnected())
+        {
+            statusLED.setOnline(true);
+        }
+        else
+        {
+            statusLED.setOnline(false);
+        }
+
+
+        // ---------------------------------------------
+        // SYSTEM READY
+        // ---------------------------------------------
+
+        // Front-panel control must not wait for Firebase. Once WiFi has
+        // connected (or initial WiFi has timed out), the local machine is
+        // ready; Firebase continues starting in the background.
+        bool networkReady = wifiTask.isConnected();
+        bool networkOffline = wifiTask.isOffline();
+
+        if (networkReady || networkOffline)
+        {
+            systemReady = true;
+
+            statusLED.setReady(true);
+
+            Serial.println();
+            Serial.println(
+                "=============================="
+            );
+            Serial.println(
+                "       SYSTEM READY"
+            );
+            Serial.println(
+                "=============================="
+            );
+
+            if (networkReady)
+            {
+                Serial.println(
+                    "Network : ONLINE"
+                );
+
+                Serial.println(
+                    firebaseManager.isReady()
+                        ? "Firebase: READY"
+                        : "Firebase: STARTING IN BACKGROUND"
+                );
+            }
+            else
+            {
+                Serial.println(
+                    "Network : OFFLINE"
+                );
+
+                Serial.println(
+                    "Firebase: NOT AVAILABLE"
+                );
+            }
+
+            Serial.println();
+        }
+
+
+        buzzer.update(now);
+        statusLED.update(now);
+
+        return;
+    }
+
+
     // =================================================
     // WIFI
     // =================================================
 
-    wifi.update();
+    wifiTask.update(now);
+
+
+    // =================================================
+    // ONLINE LED
+    // =================================================
+
+    if (wifiTask.isConnecting())
+    {
+        static unsigned long lastWiFiBlink = 0;
+        static bool wifiBlinkState = false;
+
+        if (now - lastWiFiBlink >= 500)
+        {
+            lastWiFiBlink = now;
+            wifiBlinkState = !wifiBlinkState;
+
+            statusLED.setOnline(
+                wifiBlinkState
+            );
+        }
+    }
+    else if (wifiTask.isConnected())
+    {
+        statusLED.setOnline(true);
+    }
+    else
+    {
+        statusLED.setOnline(false);
+    }
+
+
+    // =================================================
+    // FIREBASE FRONT PANEL
+    // =================================================
+    // Door safety ถูก set แล้วก่อนถึงจุดนี้
+    // =================================================
+
+    firebaseFrontPanel.update(now);
+
+
+    // =================================================
+    // NORMAL FRONT PANEL
+    // =================================================
+
+    if (!firebaseFrontPanel.hasTask())
+    {
+        frontPanel.update(now);
+    }
+
+
+    // =================================================
+    // TASK MANAGER
+    // =================================================
+
+    taskManager.update(now);
+
+
+    // =================================================
+    // FIREBASE
+    // =================================================
+
+    if (firebaseStarted)
+    {
+        firebaseManager.update(
+            now,
+            firebaseFrontPanel,
+            disinfection,
+            taskManager,
+            sensors
+        );
+    }
 
 
     // =================================================
     // DISPLAY
     // =================================================
 
-    if (wifi.isConnecting())
+    if (!firebaseFrontPanel.hasTask())
     {
-        display.startSpinner();
-    }
-    else
-    {
-        display.stopSpinner();
-    }
-
-
-    display.update();
-
-
-    // =================================================
-    // NETWORK LED
-    // =================================================
-
-    updateNetworkLED();
-
-
-    // =================================================
-    // MAIN SYSTEM
-    // =================================================
-
-    handleSystem();
-}
-
-
-// =====================================================
-// RELAY SETUP
-// =====================================================
-
-void setupRelay()
-{
-    pinMode(
-        RELAY_PIN,
-        OUTPUT
-    );
-
-
-    digitalWrite(
-        RELAY_PIN,
-        RELAY_OFF
-    );
-
-
-    Serial.println("[RELAY] OFF");
-}
-
-
-// =====================================================
-// NETWORK LED
-// =====================================================
-
-void updateNetworkLED()
-{
-    // =================================================
-    // CONNECTING
-    // =================================================
-
-    if (wifi.isConnecting())
-    {
-        digitalWrite(
-            LED_ONLINE,
-            LOW
-        );
-
-        digitalWrite(
-            LED_OFFLINE,
-            LOW
-        );
-
-
-        if (
-            millis() - ledTimer >= 300
-        )
-        {
-            ledTimer = millis();
-
-            ledBlinkState =
-                !ledBlinkState;
-
-
-            digitalWrite(
-                LED_CONNECTING,
-                ledBlinkState
-            );
-        }
-
-        return;
+        display.update(timer);
     }
 
 
     // =================================================
-    // ONLINE
+    // OUTPUT
     // =================================================
 
-    if (wifi.isOnline())
-    {
-        digitalWrite(
-            LED_CONNECTING,
-            LOW
-        );
-
-        digitalWrite(
-            LED_ONLINE,
-            HIGH
-        );
-
-        digitalWrite(
-            LED_OFFLINE,
-            LOW
-        );
-
-        return;
-    }
-
-
-    // =================================================
-    // OFFLINE
-    // =================================================
-
-    if (wifi.isOffline())
-    {
-        digitalWrite(
-            LED_CONNECTING,
-            LOW
-        );
-
-        digitalWrite(
-            LED_ONLINE,
-            LOW
-        );
-
-        digitalWrite(
-            LED_OFFLINE,
-            HIGH
-        );
-
-        return;
-    }
-}
-
-
-// =====================================================
-// MAIN SYSTEM
-// =====================================================
-
-void handleSystem()
-{
-    // =================================================
-    // ทดสอบว่า LOOP ยังทำงาน
-    // =================================================
-
-    if (
-        millis() - systemTimer >= 1000
-    )
-    {
-        systemTimer = millis();
-        display.showNumber(numberCount++);
-
-        Serial.println(
-            "[SYSTEM] RUNNING"
-        );
-    }
-
-
-    // =================================================
-    // ระบบจริงจะใส่ตรงนี้
-    // =================================================
-
-    // button.update();
-
-    // timer.update();
-
-    // relay.update();
-
-    // door.update();
-
-    // task.update();
+    buzzer.update(now);
+    statusLED.update(now);
 }

@@ -1,0 +1,11 @@
+Firebase state-write fix
+
+Files changed:
+- FirebaseManager.cpp
+- FirebaseManager.h (included for consistency; no API change intended)
+
+Rules:
+- Sensor telemetry writes only to /devices/{SN}/hw_status/sensors
+- lastseen writes only to /devices/{SN}/lastseen
+- Hardware state (busy/motor/lamps) must not be replaced by sensor/heartbeat writes
+- Task deletion remains scoped to /devices/{SN}/task
