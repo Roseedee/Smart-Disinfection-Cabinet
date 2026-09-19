@@ -25,6 +25,11 @@ public:
         Buttons& buttons
     );
 
+    // ประตูเปิด = หยุดการนับชั่วคราว
+    // _running จะยังคงเป็น true เพื่อจำสถานะเดิม
+    void setSafetyPause(bool paused);
+
+    bool isSafetyPaused() const;
 
     uint32_t remainingSeconds() const;
 
@@ -43,6 +48,9 @@ private:
     uint32_t _remainingSeconds;
 
     bool _running;
+
+    // Safety pause จาก door switch
+    bool _safetyPaused;
 
     SetMode _setMode;
 

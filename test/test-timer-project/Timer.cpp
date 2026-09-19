@@ -7,6 +7,8 @@ Timer::Timer()
 
     _running = false;
 
+    _safetyPaused = false;
+
     _setMode = MINUTE;
 
     _blinkState = true;
@@ -19,14 +21,12 @@ Timer::Timer()
 }
 
 
-// =====================================================
-// BEGIN
-// =====================================================
-
 void Timer::begin()
 {
     _remainingSeconds = 0;
     _running = false;
+
+    _safetyPaused = false;
 
     _setMode = MINUTE;
 
@@ -40,9 +40,33 @@ void Timer::begin()
 }
 
 
-// =====================================================
-// UPDATE
-// =====================================================
+void Timer::setSafetyPause(bool paused)
+{
+    if (_safetyPaused == paused)
+        return;
+
+    _safetyPaused = paused;
+
+    // เริ่มจับเวลาใหม่จากเวลาปัจจุบัน
+    // เพื่อไม่ให้เวลาที่ประตูเปิดถูกนับย้อนหลัง
+    _lastSecond = millis();
+
+    if (_safetyPaused)
+    {
+        Serial.println("[TIMER] SAFETY PAUSE - DOOR OPEN");
+    }
+    else
+    {
+        Serial.println("[TIMER] SAFETY RESUME - DOOR CLOSED");
+    }
+}
+
+
+bool Timer::isSafetyPaused() const
+{
+    return _safetyPaused;
+}
+
 
 void Timer::update(
     unsigned long now,
@@ -50,87 +74,84 @@ void Timer::update(
 )
 {
     // =================================================
-    // START / STOP
+    // BUTTON CONTROL
+    // =================================================
+    // เมื่อประตูเปิด ห้าม START/STOP/SET/UP/DOWN
     // =================================================
 
-    if (buttons.startPressed())
+    if (!_safetyPaused)
     {
-        if (_remainingSeconds > 0)
+        // START / STOP
+        if (buttons.startPressed())
         {
-            _running = !_running;
-
-            if (_running)
+            if (_remainingSeconds > 0)
             {
-                _startedEvent = true;
+                _running = !_running;
 
-                _lastSecond = now;
+                if (_running)
+                {
+                    _startedEvent = true;
+
+                    _lastSecond = now;
+
+                    _blinkState = true;
+                    _lastBlink = now;
+
+                    Serial.println("START");
+                }
+                else
+                {
+                    Serial.println("STOP");
+                }
+            }
+        }
+
+
+        // SET
+        if (buttons.setPressed())
+        {
+            if (!_running)
+            {
+                changeSetMode();
 
                 _blinkState = true;
                 _lastBlink = now;
 
-                Serial.println("START");
-            }
-            else
-            {
-                Serial.println("STOP");
-            }
-        }
-    }
-
-
-    // =================================================
-    // SET
-    // =================================================
-
-    if (buttons.setPressed())
-    {
-        if (!_running)
-        {
-            changeSetMode();
-
-            _blinkState = true;
-            _lastBlink = now;
-
-            if (_setMode == MINUTE)
-            {
-                Serial.println("SET MODE: MINUTE");
-            }
-            else
-            {
-                Serial.println("SET MODE: SECOND");
+                if (_setMode == MINUTE)
+                {
+                    Serial.println("SET MODE: MINUTE");
+                }
+                else
+                {
+                    Serial.println("SET MODE: SECOND");
+                }
             }
         }
-    }
 
 
-    // =================================================
-    // UP
-    // =================================================
-
-    if (buttons.upPressed())
-    {
-        if (!_running)
+        // UP
+        if (buttons.upPressed())
         {
-            increase();
+            if (!_running)
+            {
+                increase();
 
-            _blinkState = true;
-            _lastBlink = now;
+                _blinkState = true;
+                _lastBlink = now;
+            }
         }
-    }
 
 
-    // =================================================
-    // DOWN
-    // =================================================
-
-    if (buttons.downPressed())
-    {
-        if (!_running)
+        // DOWN
+        if (buttons.downPressed())
         {
-            decrease();
+            if (!_running)
+            {
+                decrease();
 
-            _blinkState = true;
-            _lastBlink = now;
+                _blinkState = true;
+                _lastBlink = now;
+            }
         }
     }
 
@@ -139,7 +160,7 @@ void Timer::update(
     // COUNTDOWN
     // =================================================
 
-    if (_running)
+    if (_running && !_safetyPaused)
     {
         if (now - _lastSecond >= 1000)
         {
@@ -163,18 +184,17 @@ void Timer::update(
 }
 
 
-// =====================================================
-// COUNTDOWN
-// =====================================================
-
 void Timer::countdown()
 {
     if (_remainingSeconds > 0)
     {
         _remainingSeconds--;
 
-        uint32_t minutes = _remainingSeconds / 60;
-        uint32_t seconds = _remainingSeconds % 60;
+        uint32_t minutes =
+            _remainingSeconds / 60;
+
+        uint32_t seconds =
+            _remainingSeconds % 60;
 
         Serial.print("TIME = ");
 
@@ -205,15 +225,10 @@ void Timer::countdown()
 }
 
 
-// =====================================================
-// INCREASE
-// =====================================================
-
 void Timer::increase()
 {
     uint32_t minutes = _remainingSeconds / 60;
     uint32_t seconds = _remainingSeconds % 60;
-
 
     if (_setMode == MINUTE)
     {
@@ -230,20 +245,15 @@ void Timer::increase()
             seconds = 0;
     }
 
-
-    _remainingSeconds = (minutes * 60) + seconds;
+    _remainingSeconds =
+        (minutes * 60) + seconds;
 }
 
-
-// =====================================================
-// DECREASE
-// =====================================================
 
 void Timer::decrease()
 {
     uint32_t minutes = _remainingSeconds / 60;
     uint32_t seconds = _remainingSeconds % 60;
-
 
     if (_setMode == MINUTE)
     {
@@ -260,14 +270,10 @@ void Timer::decrease()
             seconds--;
     }
 
-
-    _remainingSeconds = (minutes * 60) + seconds;
+    _remainingSeconds =
+        (minutes * 60) + seconds;
 }
 
-
-// =====================================================
-// CHANGE SET MODE
-// =====================================================
 
 void Timer::changeSetMode()
 {
@@ -277,10 +283,6 @@ void Timer::changeSetMode()
         _setMode = MINUTE;
 }
 
-
-// =====================================================
-// GETTERS
-// =====================================================
 
 uint32_t Timer::remainingSeconds() const
 {
@@ -304,6 +306,7 @@ bool Timer::getBlinkState() const
 {
     return _blinkState;
 }
+
 
 bool Timer::consumeStartedEvent()
 {

@@ -17,11 +17,15 @@ public:
 
     void begin();
 
-    // -----------------------------
-    // Lamps
-    // -----------------------------
 
-    void setLamp(uint8_t lamp, bool state);
+    // =====================================================
+    // LAMPS
+    // =====================================================
+
+    void setLamp(
+        uint8_t lamp,
+        bool state
+    );
 
     void setLamps(
         bool lamp1,
@@ -36,9 +40,9 @@ public:
     bool getLamp(uint8_t lamp) const;
 
 
-    // -----------------------------
-    // Motor
-    // -----------------------------
+    // =====================================================
+    // MOTOR
+    // =====================================================
 
     void motorOn();
     void motorOff();
@@ -46,9 +50,9 @@ public:
     bool isMotorOn() const;
 
 
-    // -----------------------------
-    // Disinfection
-    // -----------------------------
+    // =====================================================
+    // DISINFECTION
+    // =====================================================
 
     void start(
         bool lamp1,
@@ -62,6 +66,17 @@ public:
     bool isRunning() const;
 
 
+    // =====================================================
+    // STATE CHANGE
+    // =====================================================
+
+    // ตรวจว่ามี Relay / Motor เปลี่ยนสถานะหรือไม่
+    bool hasStateChanged() const;
+
+    // เรียกหลัง Firebase ส่งสถานะสำเร็จ
+    void clearStateChanged();
+
+
 private:
 
     uint8_t _lampPins[4];
@@ -71,6 +86,9 @@ private:
     bool _motorState;
 
     bool _running;
+
+    // true เมื่อ Lamp หรือ Motor มีการเปลี่ยนสถานะ
+    bool _stateChanged;
 };
 
 #endif

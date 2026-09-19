@@ -6,87 +6,160 @@
 
 #define FIREBASE_CONNECT_TIMEOUT 15000
 
+
+// =====================================================
+// FORWARD DECLARATION
+// =====================================================
+
 class FirebaseFrontPanelTask;
 class StatusLED;
+class DisinfectionController;
+class TaskManager;
+class SensorManager;
 
-class FirebaseManager
-{
+// =====================================================
+// FIREBASE MANAGER
+// =====================================================
+
+class FirebaseManager {
 public:
 
-    FirebaseManager(
-        const char* apiKey,
-        const char* databaseUrl,
-        const char* email,
-        const char* password,
-        const char* deviceSN,
-        StatusLED& statusLED
-    );
+  FirebaseManager(
+    const char* apiKey,
+    const char* databaseUrl,
+    const char* email,
+    const char* password,
+    const char* deviceSN,
+    StatusLED& statusLED);
 
-    void begin();
 
-    void update(
-        unsigned long now,
-        FirebaseFrontPanelTask& firebaseTask
-    );
+  void begin();
 
-    bool isReady() const;
 
-    bool isTimeout() const;
+  // =================================================
+  // UPDATE
+  // =================================================
+
+  void update(
+    unsigned long now,
+    FirebaseFrontPanelTask& firebaseTask,
+    DisinfectionController& disinfection,
+    TaskManager& taskManager,
+    SensorManager& sensors);
+
+
+  bool isReady() const;
+
+  bool isTimeout() const;
 
 
 private:
 
-    StatusLED& _statusLED;
+  // =================================================
+  // STATUS LED
+  // =================================================
 
-    void updateLastSeen(
-        time_t timestamp
-    );
-
-    void updateTask(
-        unsigned long now,
-        FirebaseFrontPanelTask& firebaseTask
-    );
-
-    void updateTaskValues(
-        const String& path,
-        const char* status,
-        bool isRunning,
-        const char* command,
-        uint32_t remaining,
-        uint8_t progress
-    );
-
-    void deleteTask(
-        const String& path
-    );
+  StatusLED& _statusLED;
 
 
-    const char* _apiKey;
-    const char* _databaseUrl;
-    const char* _email;
-    const char* _password;
-    const char* _deviceSN;
+  // =================================================
+  // CONFIG
+  // =================================================
+
+  const char* _apiKey;
+  const char* _databaseUrl;
+  const char* _email;
+  const char* _password;
+  const char* _deviceSN;
 
 
-    FirebaseData _fbdo;
-    FirebaseAuth _auth;
-    FirebaseConfig _config;
+  // =================================================
+  // FIREBASE
+  // =================================================
+
+  FirebaseData _fbdo;
+
+  FirebaseAuth _auth;
+
+  FirebaseConfig _config;
 
 
-    bool _ready;
+  // =================================================
+  // STATE
+  // =================================================
 
-    unsigned long _lastSeenUpdate;
+  bool _ready;
 
-    static const unsigned long LASTSEEN_INTERVAL = 5000;
+  unsigned long _startTime;
 
-
-    unsigned long _startTime;
-    bool _timeout;
+  bool _timeout;
 
 
-    unsigned long _lastTaskCheck;
+  // =================================================
+  // LAST SEEN
+  // =================================================
 
-    static const unsigned long TASK_CHECK_INTERVAL = 1000;
+  unsigned long _lastSeenUpdate;
+  unsigned long _lastSensorUpdate;
+
+  static const unsigned long LASTSEEN_INTERVAL = 5000;
+  static const unsigned long SENSOR_UPDATE_INTERVAL = 5000;
+
+
+  // =================================================
+  // FIREBASE TASK
+  // =================================================
+
+  unsigned long _lastTaskCheck;
+
+  static const unsigned long TASK_CHECK_INTERVAL = 1000;
+
+
+  // =================================================
+  // HARDWARE STATE
+  // =================================================
+
+  unsigned long _lastHardwareStateAttempt;
+
+  static const unsigned long HARDWARE_STATE_RETRY_INTERVAL = 1000;
+
+
+  // =================================================
+  // FUNCTIONS
+  // =================================================
+
+  void updateHeartbeat(
+    unsigned long now,
+    SensorManager& sensors);
+
+  void updateDoorState(
+    unsigned long now,
+    SensorManager& sensors);
+
+
+  void updateTask(
+    unsigned long now,
+    FirebaseFrontPanelTask& firebaseTask,
+    TaskManager& taskManager);
+
+
+  void updateHardwareState(
+    unsigned long now,
+    DisinfectionController& disinfection,
+    TaskManager& taskManager);
+
+
+  void updateTaskValues(
+    const String& path,
+    const char* status,
+    bool isRunning,
+    const char* command,
+    uint32_t remaining,
+    uint8_t progress);
+
+
+  void deleteTask(
+    const String& path);
 };
 
 #endif

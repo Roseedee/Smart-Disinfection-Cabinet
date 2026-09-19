@@ -27,6 +27,9 @@ DisinfectionController::DisinfectionController(
 
     _motorState = false;
     _running = false;
+
+    // เพิ่มสำหรับตรวจการเปลี่ยนแปลง
+    _stateChanged = false;
 }
 
 
@@ -42,7 +45,10 @@ void DisinfectionController::begin()
 
         _lampState[i] = false;
 
-        digitalWrite(_lampPins[i], LOW);
+        digitalWrite(
+            _lampPins[i],
+            LOW
+        );
     }
 
 
@@ -50,9 +56,15 @@ void DisinfectionController::begin()
 
     _motorState = false;
 
-    digitalWrite(_motorPin, LOW);
+    digitalWrite(
+        _motorPin,
+        LOW
+    );
 
     _running = false;
+
+    // ตอนเริ่มระบบยังไม่ถือว่าเป็นการเปลี่ยน
+    _stateChanged = false;
 }
 
 
@@ -68,7 +80,22 @@ void DisinfectionController::setLamp(
     if (lamp < 1 || lamp > 4)
         return;
 
+
     uint8_t index = lamp - 1;
+
+
+    // -------------------------------------------------
+    // ถ้าสถานะเหมือนเดิม
+    // ไม่ถือว่าเปลี่ยน
+    // -------------------------------------------------
+
+    if (_lampState[index] == state)
+        return;
+
+
+    // -------------------------------------------------
+    // เปลี่ยนสถานะจริง
+    // -------------------------------------------------
 
     _lampState[index] = state;
 
@@ -76,6 +103,10 @@ void DisinfectionController::setLamp(
         _lampPins[index],
         state ? HIGH : LOW
     );
+
+
+    // แจ้งว่ามีการเปลี่ยนแปลง
+    _stateChanged = true;
 }
 
 
@@ -131,7 +162,9 @@ void DisinfectionController::allLampsOff()
 // GET LAMP
 // =====================================================
 
-bool DisinfectionController::getLamp(uint8_t lamp) const
+bool DisinfectionController::getLamp(
+    uint8_t lamp
+) const
 {
     if (lamp < 1 || lamp > 4)
         return false;
@@ -146,12 +179,21 @@ bool DisinfectionController::getLamp(uint8_t lamp) const
 
 void DisinfectionController::motorOn()
 {
+    // ถ้าเปิดอยู่แล้ว ไม่ถือว่าเปลี่ยน
+    if (_motorState)
+        return;
+
+
     _motorState = true;
 
     digitalWrite(
         _motorPin,
         HIGH
     );
+
+
+    // แจ้งว่ามีการเปลี่ยนแปลง
+    _stateChanged = true;
 }
 
 
@@ -161,12 +203,21 @@ void DisinfectionController::motorOn()
 
 void DisinfectionController::motorOff()
 {
+    // ถ้าปิดอยู่แล้ว ไม่ถือว่าเปลี่ยน
+    if (!_motorState)
+        return;
+
+
     _motorState = false;
 
     digitalWrite(
         _motorPin,
         LOW
     );
+
+
+    // แจ้งว่ามีการเปลี่ยนแปลง
+    _stateChanged = true;
 }
 
 
@@ -198,6 +249,7 @@ void DisinfectionController::start(
         lamp4
     );
 
+
     // Motor ทำงานตลอดระหว่างกระบวนการ
     motorOn();
 
@@ -226,4 +278,24 @@ void DisinfectionController::stop()
 bool DisinfectionController::isRunning() const
 {
     return _running;
+}
+
+
+// =====================================================
+// STATE CHANGED
+// =====================================================
+
+bool DisinfectionController::hasStateChanged() const
+{
+    return _stateChanged;
+}
+
+
+// =====================================================
+// CLEAR STATE CHANGED
+// =====================================================
+
+void DisinfectionController::clearStateChanged()
+{
+    _stateChanged = false;
 }
