@@ -3,3 +3,5 @@
 !.env.example
 SDC-App/app/google-services.json
 **/FirebaseConfig.h
+/sdc-notification-server/node_modules
+sdc-notification-server/serviceAccountKey.json
