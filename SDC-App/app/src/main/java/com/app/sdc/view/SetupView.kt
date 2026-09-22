@@ -25,8 +25,8 @@ class SetupView @JvmOverloads constructor(
         findViewById<TextView>(R.id.registerButton).setOnClickListener {
             (context as? StartupActivity)?.openMainActivity()
         }
-        findViewById<TextView>(R.id.findDeviceButton).setOnClickListener {
-            (context as? StartupActivity)?.next(StartupRoute.FIND_DEVICE)
-        }
+//        findViewById<TextView>(R.id.findDeviceButton).setOnClickListener {
+//            (context as? StartupActivity)?.next(StartupRoute.FIND_DEVICE)
+//        }
     }
 }

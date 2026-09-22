@@ -54,14 +54,14 @@
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/setupSubtitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="สามารถใส่รหัสเครื่องเฉพาะที่เครื่องออนไลน์แล้วเท่านั้น"
-                android:textColor="@color/text_secondary"
-                android:fontFamily="@font/kanit"
-                android:textSize="13sp" />
+<!--            <TextView-->
+<!--                android:id="@+id/setupSubtitle"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="สามารถใส่รหัสเครื่องเฉพาะที่เครื่องออนไลน์แล้วเท่านั้น"-->
+<!--                android:textColor="@color/text_secondary"-->
+<!--                android:fontFamily="@font/kanit"-->
+<!--                android:textSize="13sp" />-->
 
             <EditText
                 android:id="@+id/fullNameInput"
@@ -102,7 +102,7 @@
                 android:layout_marginTop="25dp"
                 android:background="@drawable/bg_connect_button"
                 android:gravity="center"
-                android:text="เข้าสู่ระบบ"
+                android:text="เชื่อมต่ออุปกรณ์"
                 android:textColor="@android:color/white"
                 android:fontFamily="@font/kanit"
                 android:textSize="14sp"
@@ -112,30 +112,30 @@
 
             <!-- ปุ่มค้นหาอุปกรณ์ -->
 
-            <TextView
-                android:id="@+id/findDeviceButton"
-                android:layout_width="match_parent"
-                android:layout_height="34dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_find_button"
-                android:gravity="center"
-                android:text="ค้นหาอุปกรณ์"
-                android:textColor="@android:color/white"
-                android:fontFamily="@font/kanit"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:clickable="true"
-                android:focusable="true" />
+<!--            <TextView-->
+<!--                android:id="@+id/findDeviceButton"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="34dp"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:background="@drawable/bg_find_button"-->
+<!--                android:gravity="center"-->
+<!--                android:text="ค้นหาอุปกรณ์"-->
+<!--                android:textColor="@android:color/white"-->
+<!--                android:fontFamily="@font/kanit"-->
+<!--                android:textSize="14sp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:clickable="true"-->
+<!--                android:focusable="true" />-->
 
-            <TextView
-                android:id="@+id/connectionHelp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="วิธีการเชื่อมต่ออุปกรณ์"
-                android:textColor="@android:color/black"
-                android:fontFamily="@font/kanit"
-                android:textSize="12sp" />
+<!--            <TextView-->
+<!--                android:id="@+id/connectionHelp"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:text="วิธีการเชื่อมต่ออุปกรณ์"-->
+<!--                android:textColor="@android:color/black"-->
+<!--                android:fontFamily="@font/kanit"-->
+<!--                android:textSize="12sp" />-->
 
         </LinearLayout>
 

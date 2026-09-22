@@ -19,7 +19,5 @@ class HistoryView @JvmOverloads constructor(
             this,
             true
         )
-
-        findViewById<TextView>(R.id.textHistory).text = "History KT"
     }
 }

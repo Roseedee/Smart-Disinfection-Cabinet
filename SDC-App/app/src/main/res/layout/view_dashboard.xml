@@ -47,7 +47,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:fontFamily="@font/kanit"
-                        android:text="NHO124145OLASDF"
+                        android:text="None"
                         android:textColor="#99000000"
                         android:textSize="10sp" />
                 </LinearLayout>
@@ -77,7 +77,7 @@
                             android:layout_marginStart="5dp"
                             android:gravity="center_vertical"
                             android:fontFamily="@font/kanit_semibold"
-                            android:text="ออนไลน์"
+                            android:text="Online"
                             android:textColor="@color/connection_online"
                             android:textSize="14sp" />
                     </LinearLayout>
@@ -109,120 +109,120 @@
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:paddingBottom="10dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:background="@drawable/bg_dashboard_panel"
-                android:clipChildren="true"
-                android:clipToPadding="true"
-                android:orientation="vertical">
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:paddingBottom="10dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="20dp"-->
+<!--                android:background="@drawable/bg_dashboard_panel"-->
+<!--                android:clipChildren="true"-->
+<!--                android:clipToPadding="true"-->
+<!--                android:orientation="vertical">-->
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:background="@drawable/bg_dashboard_header"
-                    android:paddingVertical="10dp"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:fontFamily="@font/kanit_semibold"
-                    android:text="สถานะประตู"
-                    android:textColor="@color/text_header"
-                    android:textSize="14sp" />
+<!--                <TextView-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:background="@drawable/bg_dashboard_header"-->
+<!--                    android:paddingVertical="10dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:gravity="center"-->
+<!--                    android:fontFamily="@font/kanit_semibold"-->
+<!--                    android:text="สถานะประตู"-->
+<!--                    android:textColor="@color/text_header"-->
+<!--                    android:textSize="14sp" />-->
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:layout_marginTop="8dp"
-                    android:orientation="horizontal">
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="44dp"-->
+<!--                    android:layout_marginTop="8dp"-->
+<!--                    android:orientation="horizontal">-->
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical">
+<!--                    <LinearLayout-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:gravity="center"-->
+<!--                        android:orientation="vertical">-->
 
-                        <TextView
-                            android:id="@+id/doorButtonLabel"
-                            android:layout_width="match_parent"
-                            android:layout_height="22dp"
-                            android:gravity="center"
-                            android:fontFamily="@font/kanit"
-                            android:text="ปุ่มเปิดประตู"
-                            android:textColor="@android:color/black"
-                            android:textSize="10sp" />
+<!--                        <TextView-->
+<!--                            android:id="@+id/doorButtonLabel"-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="22dp"-->
+<!--                            android:gravity="center"-->
+<!--                            android:fontFamily="@font/kanit"-->
+<!--                            android:text="ปุ่มเปิดประตู"-->
+<!--                            android:textColor="@android:color/black"-->
+<!--                            android:textSize="10sp" />-->
 
-                        <TextView
-                            android:id="@+id/doorButtonValue"
-                            android:layout_width="match_parent"
-                            android:layout_height="22dp"
-                            android:gravity="center"
-                            android:fontFamily="@font/kanit_semibold"
-                            android:text="ปิด"
-                            android:textColor="@android:color/black"
-                            android:textSize="14sp" />
-                    </LinearLayout>
+<!--                        <TextView-->
+<!--                            android:id="@+id/doorButtonValue"-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="22dp"-->
+<!--                            android:gravity="center"-->
+<!--                            android:fontFamily="@font/kanit_semibold"-->
+<!--                            android:text="ปิด"-->
+<!--                            android:textColor="@android:color/black"-->
+<!--                            android:textSize="14sp" />-->
+<!--                    </LinearLayout>-->
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="10dp"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical">
+<!--                    <LinearLayout-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:layout_marginStart="10dp"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:gravity="center"-->
+<!--                        android:orientation="vertical">-->
 
-                        <TextView
-                            android:id="@+id/topDoorLabel"
-                            android:layout_width="match_parent"
-                            android:layout_height="22dp"
-                            android:gravity="center"
-                            android:fontFamily="@font/kanit"
-                            android:text="เซ็นเซอร์ประตูบน"
-                            android:textColor="@android:color/black"
-                            android:textSize="10sp" />
+<!--                        <TextView-->
+<!--                            android:id="@+id/topDoorLabel"-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="22dp"-->
+<!--                            android:gravity="center"-->
+<!--                            android:fontFamily="@font/kanit"-->
+<!--                            android:text="เซ็นเซอร์ประตูบน"-->
+<!--                            android:textColor="@android:color/black"-->
+<!--                            android:textSize="10sp" />-->
 
-                        <TextView
-                            android:id="@+id/topDoorValue"
-                            android:layout_width="match_parent"
-                            android:layout_height="22dp"
-                            android:gravity="center"
-                            android:fontFamily="@font/kanit_semibold"
-                            android:text="ปิดอยู่"
-                            android:textColor="@android:color/black"
-                            android:textSize="14sp" />
-                    </LinearLayout>
+<!--                        <TextView-->
+<!--                            android:id="@+id/topDoorValue"-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="22dp"-->
+<!--                            android:gravity="center"-->
+<!--                            android:fontFamily="@font/kanit_semibold"-->
+<!--                            android:text="ปิดอยู่"-->
+<!--                            android:textColor="@android:color/black"-->
+<!--                            android:textSize="14sp" />-->
+<!--                    </LinearLayout>-->
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="10dp"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:orientation="vertical">
+<!--                    <LinearLayout-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:layout_marginStart="10dp"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:gravity="center"-->
+<!--                        android:orientation="vertical">-->
 
-                        <TextView
-                            android:id="@+id/bottomDoorLabel"
-                            android:layout_width="match_parent"
-                            android:layout_height="22dp"
-                            android:gravity="center"
-                            android:fontFamily="@font/kanit"
-                            android:text="เซ็นเซอร์ประตูล่าง"
-                            android:textColor="@android:color/black"
-                            android:textSize="10sp" />
+<!--                        <TextView-->
+<!--                            android:id="@+id/bottomDoorLabel"-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="22dp"-->
+<!--                            android:gravity="center"-->
+<!--                            android:fontFamily="@font/kanit"-->
+<!--                            android:text="เซ็นเซอร์ประตูล่าง"-->
+<!--                            android:textColor="@android:color/black"-->
+<!--                            android:textSize="10sp" />-->
 
-                        <TextView
-                            android:id="@+id/bottomDoorValue"
-                            android:layout_width="match_parent"
-                            android:layout_height="22dp"
-                            android:gravity="center"
-                            android:fontFamily="@font/kanit_semibold"
-                            android:text="ปิดอยู่"
-                            android:textColor="@android:color/black"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-                </LinearLayout>
-            </LinearLayout>
+<!--                        <TextView-->
+<!--                            android:id="@+id/bottomDoorValue"-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="22dp"-->
+<!--                            android:gravity="center"-->
+<!--                            android:fontFamily="@font/kanit_semibold"-->
+<!--                            android:text="ปิดอยู่"-->
+<!--                            android:textColor="@android:color/black"-->
+<!--                            android:textSize="14sp" />-->
+<!--                    </LinearLayout>-->
+<!--                </LinearLayout>-->
+<!--            </LinearLayout>-->
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -268,12 +268,11 @@
                                 android:layout_weight="1"
                                 android:gravity="center_vertical"
                                 android:fontFamily="@font/kanit"
-                                android:text="ปัจจุบัน 32°C"
+                                android:text="ปัจจุบัน 0°C"
                                 android:textColor="@android:color/black"
                                 android:textSize="10sp" />
 
                             <TextView
-                                android:id="@+id/maxTemperatureText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
                                 android:gravity="center_vertical"
@@ -289,7 +288,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="5dp"
                             android:max="100"
-                            android:progress="34"
+                            android:progress="50"
                             android:progressBackgroundTint="@color/progress_track"
                             android:progressTint="@color/bg_progress" />
                     </LinearLayout>
@@ -310,9 +309,9 @@
                         android:paddingVertical="10dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/kanit"
+                        android:fontFamily="@font/kanit_semibold"
                         android:text="ความชื้น"
-                        android:textColor="@android:color/black"
+                        android:textColor="@color/text_header"
                         android:textSize="14sp" />
 
                     <LinearLayout
@@ -334,12 +333,11 @@
                                 android:layout_weight="1"
                                 android:gravity="center_vertical"
                                 android:fontFamily="@font/kanit"
-                                android:text="ปัจจุบัน 62%"
+                                android:text="ปัจจุบัน 0%"
                                 android:textColor="@android:color/black"
                                 android:textSize="10sp" />
 
                             <TextView
-                                android:id="@+id/maxHumidityText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
                                 android:gravity="center_vertical"
@@ -355,7 +353,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="5dp"
                             android:max="100"
-                            android:progress="62"
+                            android:progress="50"
                             android:progressBackgroundTint="@color/progress_track"
                             android:progressTint="@color/bg_progress" />
                     </LinearLayout>
@@ -365,172 +363,124 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
                 android:layout_marginTop="20dp"
-                android:background="@drawable/bg_dashboard_panel"
-                android:orientation="vertical">
-
-                <TextView
-                    android:background="@drawable/bg_dashboard_header"
-                    android:textAlignment="center"
-                    android:paddingVertical="10dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/kanit_semibold"
-                    android:text="การอ่านค่าของ UV"
-                    android:textColor="@color/text_header"
-                    android:textSize="14sp" />
+                android:orientation="horizontal">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="10dp"
+                    android:paddingBottom="10dp"
+                    android:background="@drawable/bg_dashboard_panel"
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/averageUvText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="16dp"
+                        android:background="@drawable/bg_dashboard_header"
+                        android:textAlignment="center"
+                        android:paddingVertical="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/kanit_semibold"
+                        android:text="สถานะประตู"
+                        android:textColor="@color/text_header"
+                        android:textSize="14sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
                         android:gravity="center"
-                        android:fontFamily="@font/kanit"
-                        android:text="ค่า UV โดยเฉลี่ย"
-                        android:textColor="@android:color/black"
-                        android:textSize="10sp" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/doorSWStatusText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit_semibold"
+                            android:text="ปิดอยู่"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingBottom="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/bg_dashboard_panel"
+                    android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/uvSensorAvgValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="22dp"
-                        android:gravity="center"
+                        android:background="@drawable/bg_dashboard_header"
+                        android:textAlignment="center"
+                        android:paddingVertical="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:fontFamily="@font/kanit_semibold"
-                        android:text="0mW/cm²"
-                        android:textColor="@android:color/black"
+                        android:text="สถานะมอเตอร์"
+                        android:textColor="@color/text_header"
                         android:textSize="14sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/motorStatusText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit_semibold"
+                            android:text="ปิดอยู่"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingBottom="10dp"
+                    android:background="@drawable/bg_dashboard_panel"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:background="@drawable/bg_dashboard_header"
+                        android:textAlignment="center"
+                        android:paddingVertical="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/kanit_semibold"
+                        android:text="การอ่านค่าของ UV"
+                        android:textColor="@color/text_header"
+                        android:textSize="14sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/uvSensorText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:fontFamily="@font/kanit_semibold"
+                            android:text="0mW/cm²"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp" />
+                    </LinearLayout>
                 </LinearLayout>
 
-<!--                <LinearLayout-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginTop="8dp"-->
-<!--                    android:orientation="horizontal">-->
 
-<!--                    <LinearLayout-->
-<!--                        android:layout_width="0dp"-->
-<!--                        android:layout_height="match_parent"-->
-<!--                        android:layout_weight="1"-->
-<!--                        android:gravity="center"-->
-<!--                        android:orientation="vertical">-->
-
-<!--                        <TextView-->
-<!--                            android:id="@+id/uvSensor1Label"-->
-<!--                            android:background="@drawable/bg_text_sensor"-->
-<!--                            android:layout_width="wrap_content"-->
-<!--                            android:layout_height="wrap_content"-->
-<!--                            android:gravity="center"-->
-<!--                            android:fontFamily="@font/kanit"-->
-<!--                            android:text="Sensor 1"-->
-<!--                            android:textColor="@android:color/black"-->
-<!--                            android:textSize="10sp" />-->
-
-<!--                        <TextView-->
-<!--                            android:id="@+id/uvSensor1Value"-->
-<!--                            android:layout_width="match_parent"-->
-<!--                            android:layout_height="22dp"-->
-<!--                            android:gravity="center"-->
-<!--                            android:fontFamily="@font/kanit_semibold"-->
-<!--                            android:text="0mW/cm²"-->
-<!--                            android:textColor="@android:color/black"-->
-<!--                            android:textSize="14sp" />-->
-<!--                    </LinearLayout>-->
-
-<!--                    <LinearLayout-->
-<!--                        android:layout_width="0dp"-->
-<!--                        android:layout_height="match_parent"-->
-<!--                        android:layout_weight="1"-->
-<!--                        android:gravity="center"-->
-<!--                        android:orientation="vertical">-->
-
-<!--                        <TextView-->
-<!--                            android:id="@+id/uvSensor2Label"-->
-<!--                            android:background="@drawable/bg_text_sensor"-->
-<!--                            android:layout_width="wrap_content"-->
-<!--                            android:layout_height="wrap_content"-->
-<!--                            android:gravity="center"-->
-<!--                            android:fontFamily="@font/kanit"-->
-<!--                            android:text="Sensor 2"-->
-<!--                            android:textColor="@android:color/black"-->
-<!--                            android:textSize="10sp" />-->
-
-<!--                        <TextView-->
-<!--                            android:id="@+id/uvSensor2Value"-->
-<!--                            android:layout_width="match_parent"-->
-<!--                            android:layout_height="22dp"-->
-<!--                            android:gravity="center"-->
-<!--                            android:fontFamily="@font/kanit_semibold"-->
-<!--                            android:text="0mW/cm²"-->
-<!--                            android:textColor="@android:color/black"-->
-<!--                            android:textSize="14sp" />-->
-<!--                    </LinearLayout>-->
-
-<!--                    <LinearLayout-->
-<!--                        android:layout_width="0dp"-->
-<!--                        android:layout_height="match_parent"-->
-<!--                        android:layout_weight="1"-->
-<!--                        android:gravity="center"-->
-<!--                        android:orientation="vertical">-->
-
-<!--                        <TextView-->
-<!--                            android:id="@+id/uvSensor3Label"-->
-<!--                            android:layout_width="wrap_content"-->
-<!--                            android:layout_height="wrap_content"-->
-<!--                            android:background="@drawable/bg_text_sensor"-->
-<!--                            android:gravity="center"-->
-<!--                            android:fontFamily="@font/kanit"-->
-<!--                            android:text="Sensor 3"-->
-<!--                            android:textColor="@android:color/black"-->
-<!--                            android:textSize="10sp" />-->
-
-<!--                        <TextView-->
-<!--                            android:id="@+id/uvSensor3Value"-->
-<!--                            android:layout_width="match_parent"-->
-<!--                            android:layout_height="22dp"-->
-<!--                            android:gravity="center"-->
-<!--                            android:fontFamily="@font/kanit_semibold"-->
-<!--                            android:text="0mW/cm²"-->
-<!--                            android:textColor="@android:color/black"-->
-<!--                            android:textSize="14sp" />-->
-<!--                    </LinearLayout>-->
-
-<!--                    <LinearLayout-->
-<!--                        android:layout_width="0dp"-->
-<!--                        android:layout_height="match_parent"-->
-<!--                        android:layout_weight="1"-->
-<!--                        android:gravity="center"-->
-<!--                        android:orientation="vertical">-->
-
-<!--                        <TextView-->
-<!--                            android:id="@+id/uvSensor4Label"-->
-<!--                            android:background="@drawable/bg_text_sensor"-->
-<!--                            android:layout_width="wrap_content"-->
-<!--                            android:layout_height="wrap_content"-->
-<!--                            android:gravity="center"-->
-<!--                            android:fontFamily="@font/kanit"-->
-<!--                            android:text="Sensor 4"-->
-<!--                            android:textColor="@android:color/black"-->
-<!--                            android:textSize="10sp" />-->
-
-<!--                        <TextView-->
-<!--                            android:id="@+id/uvSensor4Value"-->
-<!--                            android:layout_width="match_parent"-->
-<!--                            android:layout_height="22dp"-->
-<!--                            android:gravity="center"-->
-<!--                            android:fontFamily="@font/kanit_semibold"-->
-<!--                            android:text="0mW/cm²"-->
-<!--                            android:textColor="@android:color/black"-->
-<!--                            android:textSize="14sp" />-->
-<!--                    </LinearLayout>-->
-<!--                </LinearLayout>-->
             </LinearLayout>
 
             <LinearLayout
@@ -566,7 +516,6 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/uvLightLeftLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="@drawable/bg_text_sensor"
@@ -577,9 +526,9 @@
                             android:textSize="10sp" />
 
                         <TextView
-                            android:id="@+id/uvLightLeftValue"
+                            android:id="@+id/lightStatus1"
                             android:layout_width="match_parent"
-                            android:layout_height="22dp"
+                            android:layout_height="wrap_content"
                             android:layout_marginTop="3dp"
                             android:gravity="center"
                             android:fontFamily="@font/kanit_semibold"
@@ -596,7 +545,6 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/uvLightTopLeftLabel"
                             android:background="@drawable/bg_text_sensor"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -607,13 +555,13 @@
                             android:textSize="10sp" />
 
                         <TextView
-                            android:id="@+id/uvLightTopLeftValue"
+                            android:id="@+id/lightStatus2"
                             android:layout_width="match_parent"
-                            android:layout_height="22dp"
+                            android:layout_height="wrap_content"
                             android:layout_marginTop="3dp"
                             android:gravity="center"
                             android:fontFamily="@font/kanit_semibold"
-                            android:text="เปิดอยู่"
+                            android:text="ปิดอยู่"
                             android:textColor="@android:color/black"
                             android:textSize="14sp" />
                     </LinearLayout>
@@ -626,7 +574,6 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/uvLightTopRightLabel"
                             android:background="@drawable/bg_text_sensor"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -637,13 +584,13 @@
                             android:textSize="10sp" />
 
                         <TextView
-                            android:id="@+id/uvLightTopRightValue"
+                            android:id="@+id/lightStatus3"
                             android:layout_width="match_parent"
-                            android:layout_height="22dp"
+                            android:layout_height="wrap_content"
                             android:layout_marginTop="3dp"
                             android:gravity="center"
                             android:fontFamily="@font/kanit_semibold"
-                            android:text="เปิดอยู่"
+                            android:text="ปิดอยู่"
                             android:textColor="@android:color/black"
                             android:textSize="14sp" />
                     </LinearLayout>
@@ -656,7 +603,6 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/uvLightRightLabel"
                             android:background="@drawable/bg_text_sensor"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -667,7 +613,7 @@
                             android:textSize="10sp" />
 
                         <TextView
-                            android:id="@+id/uvLightRightValue"
+                            android:id="@+id/lightStatus4"
                             android:layout_width="match_parent"
                             android:layout_height="22dp"
                             android:layout_marginTop="3dp"

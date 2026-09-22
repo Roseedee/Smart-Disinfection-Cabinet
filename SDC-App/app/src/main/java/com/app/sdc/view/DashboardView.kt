@@ -48,7 +48,6 @@ class DashboardView @JvmOverloads constructor(
         dashboardRef = FirebaseDatabase.getInstance()
             .getReference("devices")
             .child("WE16WE1V6W")
-            .child("dashboard")
 
         dashboardListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -65,7 +64,6 @@ class DashboardView @JvmOverloads constructor(
 
     private fun renderDashboard(snapshot: DataSnapshot) {
         val serial = snapshot.text("serialNumber", "none")
-        val isOnline = snapshot.boolean("online", true)
         val temperatureCurrent = snapshot.double("temperature/current", 32.0)
         val temperatureMax = snapshot.double("temperature/max", 100.0)
         val humidityCurrent = snapshot.double("humidity/current", 62.0)
