@@ -1,19 +1,19 @@
 package com.app.sdc.view
 
 import android.content.Context
-import android.service.autofill.Validators.not
 import android.util.AttributeSet
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.FrameLayout
 import android.widget.RadioButton
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.app.sdc.R
-import org.json.JSONObject
-import java.net.HttpURLConnection
-import java.net.URL
+import com.app.sdc.UserSession
+import com.google.firebase.database.FirebaseDatabase
 
 class AddTaskView @JvmOverloads constructor(
     context: Context,
@@ -21,23 +21,18 @@ class AddTaskView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private lateinit var hourRadio: RadioButton
-    private lateinit var minuteRadio: RadioButton
-    private lateinit var secondRadio: RadioButton
+    private var hourRadio: RadioButton
+    private var minuteRadio: RadioButton
+    private var secondRadio: RadioButton
 
     private var hours = 0
     private var minutes = 0
     private var seconds = 0
 
-    private lateinit var lamp1Button: SwitchMaterial
-    private lateinit var lamp2Button: SwitchMaterial
-    private lateinit var lamp3Button: SwitchMaterial
-    private lateinit var lamp4Button: SwitchMaterial
-
-    private lateinit var addTaskButton: Button
-
-    private val databaseUrl = "databaseurl"
-    private val deviceId = "esp_001"
+    private var lamp1Button: SwitchMaterial
+    private var lamp2Button: SwitchMaterial
+    private var lamp3Button: SwitchMaterial
+    private var lamp4Button: SwitchMaterial
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_add_task, this, true)
@@ -71,6 +66,8 @@ class AddTaskView @JvmOverloads constructor(
             uploadTaskToFirebase()
         }
     }
+
+    var onFinished: (() -> Unit)? = null
 
     private fun increaseSelectedTime() {
         when {
@@ -130,64 +127,75 @@ class AddTaskView @JvmOverloads constructor(
 
     private fun uploadTaskToFirebase() {
         val duration = getDuration()
+
         if (duration <= 0) {
-            Toast.makeText(context, "กรุณากำหนดเวลา", Toast.LENGTH_SHORT ).show()
+            Toast.makeText(context, "กรุณากำหนดเวลา", Toast.LENGTH_SHORT).show()
             return
         }
-        if(!lamp1Button.isChecked && !lamp2Button.isChecked && !lamp3Button.isChecked && !lamp4Button.isChecked) {
-            Toast.makeText(context, "กรุณาเปิดไฟ", Toast.LENGTH_SHORT ).show()
+
+        if (!lamp1Button.isChecked &&
+            !lamp2Button.isChecked &&
+            !lamp3Button.isChecked &&
+            !lamp4Button.isChecked
+        ) {
+            Toast.makeText(context, "กรุณาเปิดไฟ", Toast.LENGTH_SHORT).show()
             return
         }
+
         val taskId = generateTaskId()
+        val userId = UserSession.getUserId(context)
+        val deviceSN = UserSession.getDeviceSN(context)
 
-        val lamps = JSONObject()
-        lamps.put("L1", lamp1Button.isChecked)
-        lamps.put("L2", lamp2Button.isChecked)
-        lamps.put("L3", lamp3Button.isChecked)
-        lamps.put("L4", lamp4Button.isChecked)
+        if (userId.isNullOrEmpty()) {
+            Toast.makeText(context, "ไม่พบข้อมูลผู้ใช้", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-        val task = JSONObject()
-        task.put("duration", duration)
-        task.put("status", "pending")
-        task.put("lamps",lamps)
+        if (deviceSN.isNullOrEmpty()) {
+            Toast.makeText(context, "ไม่พบข้อมูลอุปกรณ์", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-        val urlString = "$databaseUrl/devices/$deviceId/tasks/$taskId.json"
+        val lamps = mapOf(
+            "L1" to lamp1Button.isChecked,
+            "L2" to lamp2Button.isChecked,
+            "L3" to lamp3Button.isChecked,
+            "L4" to lamp4Button.isChecked
+        )
 
-        Thread {
-            var connection: HttpURLConnection? = null
-            try {
-                val url = URL(urlString)
-                connection = url.openConnection() as HttpURLConnection
-                connection.requestMethod = "PUT"
-                connection.setRequestProperty(
-                    "Content-Type",
-                    "application/json"
-                )
-                connection.doOutput = true
-                connection.connectTimeout = 10000
-                connection.readTimeout = 10000
-                connection.outputStream.use { output -> output.write(task.toString().toByteArray(Charsets.UTF_8))}
+        val notifyFinish = findViewById<CheckBox>(R.id.notifyCheckBox).isChecked
 
-                val responseCode = connection.responseCode
+        val task = mapOf(
+            "task_id" to taskId,
+            "userid" to userId,
+            "duration" to duration,
+            "remaining" to duration,
+            "status" to "pending",
+            "command" to "start",
+            "notify_finish" to notifyFinish,
+            "lamps" to lamps
+        )
 
-                post {
-                    if (responseCode in 200..299) {
-                        Toast.makeText(context, "เพิ่มงานสำเร็จ\n$taskId",Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(context, "เพิ่มงานไม่สำเร็จ\nHTTP $responseCode",Toast.LENGTH_LONG).show()
-                    }
-                }
-            } catch (e: Exception) {
-                post {
-                    Toast.makeText(
-                        context,
-                        "เกิดข้อผิดพลาด\n${e.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            } finally {
-                connection?.disconnect()
+        Log.d("FirebaseTask", "Device = $deviceSN")
+        Log.d("FirebaseTask", "Task = $task")
+
+        val taskRef = FirebaseDatabase.getInstance()
+            .getReference("devices")
+            .child(deviceSN)
+            .child("task")
+
+        taskRef.setValue(task)
+            .addOnSuccessListener {
+                Log.d("FirebaseTask", "Upload success")
+                Toast.makeText(context, "เพิ่มงานสำเร็จ\n$taskId", Toast.LENGTH_SHORT).show()
+                onFinished?.invoke()
             }
-        }.start()
+            .addOnFailureListener { e ->
+                Log.e("FirebaseTask", "Upload failed", e)
+                Toast.makeText(context, "เพิ่มงานไม่สำเร็จ\n${e.message}", Toast.LENGTH_LONG).show()
+                onFinished?.invoke()
+            }
+
+
     }
 }

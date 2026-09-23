@@ -48,7 +48,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:fontFamily="@font/kanit"
-                        android:text="NHO124145OLASDF"
+                        android:text="None"
                         android:textColor="#99000000"
                         android:textSize="10sp" />
                 </LinearLayout>
