@@ -23,11 +23,6 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import android.util.Log
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.messaging.FirebaseMessaging
-import android.Manifest
-import android.content.pm.PackageManager
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
     private var deviceRef: DatabaseReference? = null
     private var deviceListener: ValueEventListener? = null
-    private val deviceSn = "AWE416E1W61"
+    private lateinit var deviceSn: String
     private var lastSeen: Long = 0L
     private var deviceOnline: Boolean = false
     private var deviceBusy: Boolean = false
@@ -45,6 +40,8 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
+        deviceSn = UserSession.getDeviceSN(this) ?: ""
+
         applySystemBarsPadding()
 
         contentContainer = findViewById(R.id.contentContainer)
@@ -53,121 +50,12 @@ class MainActivity : AppCompatActivity() {
 
         observeDeviceOnline()
 
-        getFCMToken()
-
-        requestNotificationPermission()
-
         onlineHandler.post(onlineChecker)
 
         showDashboard()
     }
 
-    private fun getFCMToken() {
 
-        FirebaseMessaging.getInstance().token
-            .addOnCompleteListener { task ->
-
-                if (!task.isSuccessful) {
-
-                    Log.e(
-                        "FCM",
-                        "Failed to get FCM token",
-                        task.exception
-                    )
-
-                    return@addOnCompleteListener
-                }
-
-                val token = task.result
-
-                Log.d(
-                    "FCM",
-                    "FCM TOKEN = $token"
-                )
-            }
-    }
-
-    private fun requestNotificationPermission() {
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-
-            if (
-                ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                    1001
-                )
-            }
-        }
-    }
-
-    private fun setupMenu() {
-        findViewById<View>(R.id.menuDashboard).setOnClickListener {
-            showDashboard()
-        }
-        findViewById<View>(R.id.menuHistory).setOnClickListener {
-            showHistory()
-        }
-        findViewById<View>(R.id.menuSettings).setOnClickListener {
-            showSettings()
-        }
-    }
-
-    private fun showDashboard() {
-        val dashboardView = DashboardView(this)
-
-        dashboardView.onAddTaskClick = onAddTaskClick@{
-
-            if (deviceBusy) {
-                Snackbar.make(findViewById(R.id.main), "อุปกรณ์กำลังทำงานอยู่", Snackbar.LENGTH_LONG).show()
-                return@onAddTaskClick
-            }
-
-            if (!deviceOnline) {
-                Snackbar.make(findViewById(R.id.main), "อุปกรณ์ Offline อยู่", Snackbar.LENGTH_LONG).show()
-                return@onAddTaskClick
-            }
-
-            contentContainer.removeAllViews()
-
-            contentContainer.addView(
-                AddTaskView(this)
-            )
-        }
-        contentContainer.removeAllViews()
-        contentContainer.addView(
-            dashboardView
-        )
-        findViewById<TextView>(R.id.menuDashboard).isSelected = true
-        findViewById<TextView>(R.id.menuHistory).isSelected = false
-        findViewById<TextView>(R.id.menuSettings).isSelected = false
-    }
-
-    private fun showHistory() {
-        contentContainer.removeAllViews()
-        contentContainer.addView(
-            HistoryView(this)
-        )
-        findViewById<TextView>(R.id.menuDashboard).isSelected = false
-        findViewById<TextView>(R.id.menuHistory).isSelected = true
-        findViewById<TextView>(R.id.menuSettings).isSelected = false
-    }
-
-    private fun showSettings() {
-        contentContainer.removeAllViews()
-        contentContainer.addView(
-            SettingsView(this)
-        )
-        findViewById<TextView>(R.id.menuDashboard).isSelected = false
-        findViewById<TextView>(R.id.menuHistory).isSelected = false
-        findViewById<TextView>(R.id.menuSettings).isSelected = true
-    }
 
     private val onlineHandler = Handler(Looper.getMainLooper())
 
@@ -198,7 +86,7 @@ class MainActivity : AppCompatActivity() {
             "FirebaseApp initialized successfully"
         )
 
-        deviceRef = FirebaseDatabase.getInstance().getReference("devices").child(deviceSn)
+        deviceRef = FirebaseDatabase.getInstance().getReference("devices").child(deviceSn ?: return)
         Log.d(
             "FirebaseDebug",
             "Firebase path = devices/$deviceSn"
@@ -301,6 +189,71 @@ class MainActivity : AppCompatActivity() {
             )
             onlineDot?.background = getDrawable(R.drawable.bg_offline_dot)
         }
+    }
+
+    private fun setupMenu() {
+        findViewById<View>(R.id.menuDashboard).setOnClickListener {
+            showDashboard()
+        }
+        findViewById<View>(R.id.menuHistory).setOnClickListener {
+            showHistory()
+        }
+        findViewById<View>(R.id.menuSettings).setOnClickListener {
+            showSettings()
+        }
+    }
+
+    private fun showDashboard() {
+        val dashboardView = DashboardView(this)
+
+        dashboardView.onAddTaskClick = onAddTaskClick@{
+
+            if (deviceBusy) {
+                Snackbar.make(findViewById(R.id.main), "อุปกรณ์กำลังทำงานอยู่", Snackbar.LENGTH_LONG).show()
+                return@onAddTaskClick
+            }
+
+            if (!deviceOnline) {
+                Snackbar.make(findViewById(R.id.main), "อุปกรณ์ Offline อยู่", Snackbar.LENGTH_LONG).show()
+                return@onAddTaskClick
+            }
+
+            val addTaskView = AddTaskView(this)
+
+            addTaskView.onFinished = {
+                showDashboard()
+            }
+
+            contentContainer.removeAllViews()
+            contentContainer.addView(addTaskView)
+        }
+        contentContainer.removeAllViews()
+        contentContainer.addView(
+            dashboardView
+        )
+        findViewById<TextView>(R.id.menuDashboard).isSelected = true
+        findViewById<TextView>(R.id.menuHistory).isSelected = false
+        findViewById<TextView>(R.id.menuSettings).isSelected = false
+    }
+
+    private fun showHistory() {
+        contentContainer.removeAllViews()
+        contentContainer.addView(
+            HistoryView(this)
+        )
+        findViewById<TextView>(R.id.menuDashboard).isSelected = false
+        findViewById<TextView>(R.id.menuHistory).isSelected = true
+        findViewById<TextView>(R.id.menuSettings).isSelected = false
+    }
+
+    private fun showSettings() {
+        contentContainer.removeAllViews()
+        contentContainer.addView(
+            SettingsView(this)
+        )
+        findViewById<TextView>(R.id.menuDashboard).isSelected = false
+        findViewById<TextView>(R.id.menuHistory).isSelected = false
+        findViewById<TextView>(R.id.menuSettings).isSelected = true
     }
 
     private fun applySystemBarsPadding() {
