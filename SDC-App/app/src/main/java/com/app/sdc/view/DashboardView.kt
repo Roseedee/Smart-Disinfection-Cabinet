@@ -2,11 +2,12 @@ package com.app.sdc.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import com.app.sdc.R
+import com.app.sdc.UserSession
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -22,6 +23,7 @@ class DashboardView @JvmOverloads constructor(
 
     private var dashboardRef: DatabaseReference? = null
     private var dashboardListener: ValueEventListener? = null
+    private var devicesn: String
 
     var onAddTaskClick: (() -> Unit)? = null
 
@@ -32,6 +34,7 @@ class DashboardView @JvmOverloads constructor(
             true
         )
 
+        devicesn = UserSession.getDeviceSN(context) ?: ""
 
         observeDashboard()
 
@@ -47,7 +50,8 @@ class DashboardView @JvmOverloads constructor(
 
         dashboardRef = FirebaseDatabase.getInstance()
             .getReference("devices")
-            .child("WE16WE1V6W")
+            .child(devicesn)
+            .child("hw_status")
 
         dashboardListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -63,15 +67,30 @@ class DashboardView @JvmOverloads constructor(
     }
 
     private fun renderDashboard(snapshot: DataSnapshot) {
-        val serial = snapshot.text("serialNumber", "none")
-        val temperatureCurrent = snapshot.double("temperature/current", 32.0)
-        val temperatureMax = snapshot.double("temperature/max", 100.0)
-        val humidityCurrent = snapshot.double("humidity/current", 62.0)
-        val humidityMax = snapshot.double("humidity/max", 100.0)
+        val door_open = snapshot.boolean("sensors/door_open", false)
+        val temperatureCurrent = snapshot.double("sensors/temperature", 0.0)
+        val humidityCurrent = snapshot.double("sensors/humidity", 0.0)
+        val uv_raw = snapshot.double("sensors/uv_raw", 0.0)
+        val lamp1 = snapshot.boolean("lamps/1", false)
+        val lamp2 = snapshot.boolean("lamps/2", false)
+        val lamp3 = snapshot.boolean("lamps/3", false)
+        val lamp4 = snapshot.boolean("lamps/4", false)
+        val motor_status = snapshot.boolean("motor", false)
 
-        findViewById<TextView>(R.id.deviceNameText).text = snapshot.text("deviceName", "เครื่องอบฆ่าเชื้อ")
-        findViewById<TextView>(R.id.deviceSerialText).text = serial
+        findViewById<TextView>(R.id.currentTemperatureText).text = "ปัจจุบัน ${temperatureCurrent.displayNumber()}°C"
+        findViewById<ProgressBar>(R.id.temperatureProgress).progress = percent(temperatureCurrent, 100.0)
+        findViewById<TextView>(R.id.currentHumidityText).text = "ปัจจุบัน ${humidityCurrent.displayNumber()}%"
+        findViewById<ProgressBar>(R.id.humidityProgress).progress = percent(humidityCurrent, 100.0)
+        findViewById<TextView>(R.id.uvSensorText).text = "${uv_raw.displayNumber()}" //mW/cm²
 
+        findViewById<TextView>(R.id.doorSWStatusText).text = if (door_open) "เปิดอยู่" else "ปิดอยู่"
+
+        findViewById<TextView>(R.id.lightStatus1).text = if (lamp1) "เปิดอยู่" else "ปิดอยู่"
+        findViewById<TextView>(R.id.lightStatus2).text = if (lamp2) "เปิดอยู่" else "ปิดอยู่"
+        findViewById<TextView>(R.id.lightStatus3).text = if (lamp3) "เปิดอยู่" else "ปิดอยู่"
+        findViewById<TextView>(R.id.lightStatus4).text = if (lamp4) "เปิดอยู่" else "ปิดอยู่"
+
+        findViewById<TextView>(R.id.motorStatusText).text = if (motor_status) "เปิดอยู่" else "ปิดอยู่"
     }
 
     private fun DataSnapshot.text(path: String, fallback: String): String {
