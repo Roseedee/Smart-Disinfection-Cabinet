@@ -4,9 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
-import android.widget.EditText
 import android.widget.FrameLayout
-import android.widget.ScrollView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -29,37 +27,6 @@ class StartupActivity : AppCompatActivity() {
         }
 
         setContentView(R.layout.activity_startup)
-
-        val setupScroll =
-            findViewById<ScrollView>(R.id.setupScroll)
-
-        val fullNameInput =
-            findViewById<EditText>(R.id.fullNameInput)
-
-        val deviceCodeInput =
-            findViewById<EditText>(R.id.deviceCodeInput)
-
-        fullNameInput.setOnFocusChangeListener { view, hasFocus ->
-            if (hasFocus) {
-                setupScroll.postDelayed({
-                    setupScroll.smoothScrollTo(
-                        0,
-                        view.bottom
-                    )
-                }, 200)
-            }
-        }
-
-        deviceCodeInput.setOnFocusChangeListener { view, hasFocus ->
-            if (hasFocus) {
-                setupScroll.postDelayed({
-                    setupScroll.smoothScrollTo(
-                        0,
-                        view.bottom
-                    )
-                }, 200)
-            }
-        }
 
         startupContainer = findViewById(R.id.startupContainer)
 
