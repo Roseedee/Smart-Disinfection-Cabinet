@@ -1,5 +1,6 @@
 package com.app.sdc
 
+import android.content.Intent
 import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -20,6 +21,14 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     ) {
         super.onMessageReceived(message)
 
+        val title =
+            message.notification?.title
+                ?: "แจ้งเตือน"
+
+        val body =
+            message.notification?.body
+                ?: ""
+
         Log.d(
             "FCM",
             "Message received"
@@ -27,12 +36,34 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         Log.d(
             "FCM",
-            "Title = ${message.notification?.title}"
+            "Title = $title"
         )
 
         Log.d(
             "FCM",
-            "Body = ${message.notification?.body}"
+            "Body = $body"
+        )
+
+        val intent =
+            Intent("com.app.sdc.FCM_NOTIFICATION")
+
+        intent.setPackage(packageName)
+
+        intent.putExtra(
+            "title",
+            title
+        )
+
+        intent.putExtra(
+            "body",
+            body
+        )
+
+        sendBroadcast(intent)
+
+        Log.d(
+            "FCM",
+            "Broadcast sent"
         )
     }
 }

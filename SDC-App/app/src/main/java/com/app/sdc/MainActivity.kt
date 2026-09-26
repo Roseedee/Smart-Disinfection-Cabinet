@@ -1,6 +1,10 @@
 package com.app.sdc
 
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -35,10 +39,57 @@ class MainActivity : AppCompatActivity() {
     private var deviceOnline: Boolean = false
     private var deviceBusy: Boolean = false
 
+    private var notificationReceiver: BroadcastReceiver? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
+        notificationReceiver =
+            object : BroadcastReceiver() {
+
+                override fun onReceive(
+                    context: Context?,
+                    intent: Intent?
+                ) {
+                    Log.d(
+                        "FCM_UI",
+                        "Broadcast received"
+                    )
+
+                    val title =
+                        intent?.getStringExtra("title")
+                            ?: return
+
+                    val body =
+                        intent.getStringExtra("body")
+                            ?: ""
+
+                    Log.d(
+                        "FCM_UI",
+                        "Title = $title"
+                    )
+
+                    Log.d(
+                        "FCM_UI",
+                        "Body = $body"
+                    )
+
+                    showNotificationBanner(
+                        title,
+                        body
+                    )
+                }
+            }
+
+        registerReceiver(
+            notificationReceiver,
+            IntentFilter(
+                "com.app.sdc.FCM_NOTIFICATION"
+            ),
+            Context.RECEIVER_NOT_EXPORTED
+        )
 
         deviceSn = UserSession.getDeviceSN(this) ?: ""
 
@@ -53,8 +104,44 @@ class MainActivity : AppCompatActivity() {
         onlineHandler.post(onlineChecker)
 
         showDashboard()
+
+
     }
 
+    private fun showNotificationBanner(
+        title: String,
+        body: String
+    ) {
+
+        val container = findViewById<FrameLayout>(R.id.notificationContainer)
+
+        container.removeAllViews()
+
+        val banner = layoutInflater.inflate(R.layout.notification_banner, container, false)
+
+        val titleText = banner.findViewById<TextView>(R.id.notificationTitle)
+
+        val bodyText = banner.findViewById<TextView>(R.id.notificationBody)
+
+        titleText.text = title
+        bodyText.text = body
+
+        container.addView(banner)
+
+        banner.translationY = -banner.height.toFloat()
+
+        banner.post {
+            banner.translationY = -banner.height.toFloat()
+
+            banner.animate().translationY(0f).setDuration(300).start()
+
+            banner.postDelayed({
+                banner.animate().translationY(-banner.height.toFloat()).setDuration(300).withEndAction {
+                        container.removeView(banner)
+                    }.start()
+            }, 4000)
+        }
+    }
 
 
     private val onlineHandler = Handler(Looper.getMainLooper())
@@ -86,7 +173,7 @@ class MainActivity : AppCompatActivity() {
             "FirebaseApp initialized successfully"
         )
 
-        deviceRef = FirebaseDatabase.getInstance().getReference("devices").child(deviceSn ?: return)
+        deviceRef = FirebaseDatabase.getInstance().getReference("devices").child(deviceSn)
         Log.d(
             "FirebaseDebug",
             "Firebase path = devices/$deviceSn"
@@ -141,7 +228,7 @@ class MainActivity : AppCompatActivity() {
 
         val difference = if (lastSeen > 0L) { now - lastSeen } else { -1L }
 
-        deviceOnline = lastSeen > 0L && difference <= 15L
+        deviceOnline = lastSeen > 0L && difference <= 20L
 
         val usageStatus = when {
             !deviceOnline ->
@@ -277,6 +364,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+
+        notificationReceiver?.let {
+            unregisterReceiver(it)
+        }
+
+        notificationReceiver = null
 
         onlineHandler.removeCallbacks(
             onlineChecker

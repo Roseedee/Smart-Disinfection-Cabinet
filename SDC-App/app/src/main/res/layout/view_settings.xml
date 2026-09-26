@@ -3,11 +3,190 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textSettings"
-        android:gravity="center"
+    <ScrollView
+        android:id="@+id/settingScroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Dashboard"/>
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingTop="15dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="38dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/deviceNameText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:fontFamily="@font/kanit_semibold"
+                        android:text="เครื่องอบฆ่าเชื้อ"
+                        android:textColor="@color/text_header"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/deviceSerialText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:fontFamily="@font/kanit"
+                        android:text="None"
+                        android:textColor="#000"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="end"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical|end"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:id="@+id/onlineDot"
+                            android:layout_width="5dp"
+                            android:layout_height="5dp"
+                            android:background="@drawable/bg_online_dot" />
+
+                        <TextView
+                            android:id="@+id/onlineStatusText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:gravity="center_vertical"
+                            android:fontFamily="@font/kanit_semibold"
+                            android:text="Online"
+                            android:textColor="@color/connection_online"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/usageStatusText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="end|center_vertical"
+                        android:fontFamily="@font/kanit"
+                        android:text="ยังไม่มีการใช้งาน"
+                        android:textColor="#000"
+                        android:textSize="10sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/kanit"
+                    android:text="ชื่อ-นามสกุล"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="5dp"
+                    android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/fullNameInput"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="42dp"
+                    android:background="@drawable/bg_setup_input"
+                    android:hint="ชื่อ-นามสกุล"
+                    android:inputType="textPersonName"
+                    android:paddingHorizontal="12dp"
+                    android:singleLine="true"
+                    android:textColor="@android:color/black"
+                    android:textColorHint="@color/text_hint"
+                    android:fontFamily="@font/kanit"
+                    android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/btnSaveName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_find_button"
+                        android:fontFamily="@font/kanit_bold"
+                        android:paddingHorizontal="15dp"
+                        android:layout_marginLeft="10dp"
+                        android:gravity="center"
+                        android:text="บันทึก"
+                        android:textSize="14sp"/>
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/kanit"
+                    android:text="รหัสประจำตัวเครื่อง"/>
+
+                <EditText
+                    android:id="@+id/deviceSNInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="42dp"
+                    android:background="@drawable/bg_setup_input"
+                    android:hint="device sn"
+                    android:inputType="textPersonName"
+                    android:paddingHorizontal="12dp"
+                    android:layout_marginTop="5dp"
+                    android:singleLine="true"
+                    android:textColor="@android:color/black"
+                    android:textColorHint="@color/text_hint"
+                    android:fontFamily="@font/kanit"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_marginTop="15dp"
+                android:layout_height="0dp"
+                android:gravity="bottom"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/btnLogOut"
+                    android:layout_width="match_parent"
+                    android:layout_height="34dp"
+                    android:background="@drawable/bg_button_cancel_task"
+                    android:fontFamily="@font/kanit"
+                    android:text="ออกจากระบบ"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:gravity="center" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
 </FrameLayout>
