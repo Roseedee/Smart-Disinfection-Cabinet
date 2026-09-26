@@ -16,6 +16,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import android.content.Intent
+import com.app.sdc.StartupActivity
 
 class SettingsView @JvmOverloads constructor(
     context: Context,
@@ -238,11 +240,14 @@ class SettingsView @JvmOverloads constructor(
     private fun logout() {
         clearUserSession()
 
-        Toast.makeText(
-            context,
-            "ออกจากระบบแล้ว",
-            Toast.LENGTH_SHORT
-        ).show()
+        val intent =
+            Intent(context, StartupActivity::class.java)
+
+        intent.flags =
+            Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+        context.startActivity(intent)
     }
 
     private fun clearUserSession() {
