@@ -486,6 +486,15 @@ async function deleteExpiredTask() {
                 `users/${userId}/history/${taskId}`
             );
 
+        const hwStatusRef =
+            db.ref(`devices/${deviceSn}/hw_status`);
+
+        await hwStatusRef.update({
+            busy: false,
+            lamps: [false, false, false, false],
+            motor: false
+        });
+
         await historyRef.set(
             task
         );
